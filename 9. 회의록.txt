@@ -1687,3 +1687,44 @@ toExcel : 몇천건 넘어가면 오류 생겨서 => toLargeExel
 오타제거
 다음주 부터 내부프로젝트 집중적으로 진행 (자바, 쿼리)
 
+====================================================================================
+
+2023-04-26 (수)
+
+작업(28일 까지) - 금요일 오후에 테스트
+
+옵션 상품 그룹 관리, 옵션 메뉴 관리 => 라디오 or 체크박스
+
+메뉴 상세
+ L 메뉴 옵션 조회
+ L 주문 등록
+
+src => main => java => userveAPI폴더에 "PKG_API_본인이니셜" 로 패키지 생성(※ 패키지안에 controller, service, mapper 생성) 
+HostMain 확인가능
+파라미터 IN,OUT 주석처리 설명
+
+* 테이블
+1. 메뉴옵션조회
+ 1) MENU_MASTER(품목코드): PK - CORP_CODE(법인코드), MENU_CODE(품목코드)
+ - 메뉴명, 이미지파일, 메뉴설명
+  
+ 2) UPJANG_MENU(영업장_메뉴_코드): PK - CORP_CODE(법인코드), MENU_CODE(품목코드)
+ - 메뉴명
+ 
+ 3) UPJANG_PACKAGE_MENU(패키지 메뉴 등록)
+ 4) UPJANG_MENU_PRICE(업장별 시즌 금액 정보)
+ 
+ 5) MENU_OPTION (옵션 상품 그룹관리): PK - CORP_CODE(법인코드), UPJANG_CODE(영업장코드), MENU_CODE(메뉴코드), GROUP_CDE(옵션 그룹 코드)
+ - 옵션 그룹
+
+ 6) MENU_OPTION_DETAIL(옵션 상품 그룹별 메뉴 관리): PK - CORP_CODE(법인코드), UPJANG_CODE(영업장코드), MENU_CODE(메뉴코드), GROUP_CDE(옵션 그룹 코드), OPTION_MENU_CODE(옵션 메뉴 코드)
+  - 각 옵션 판매금액
+  - 최대수량
+
+ 7) OPTION_MASTER(옵션 마스터): PK - CORP_CODE(법인코드), GROUP_CODE(옵션그룹코드)
+  - 옵션 그룹
+ 
+ 8) OPTION_DETAIL(옵션 디테일): PK - CORP_CODE(법인코드), GROUP_CODE(옵션그룹코드), OPTION_CODE(옵션코드), OPTION_NAME(옵션명)
+ - 옵션명
+
+2. 주문등록

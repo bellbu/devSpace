@@ -1056,20 +1056,19 @@ PKG_SpaLockerSalesRegistration.SP_DELETE2 추가
 락카상태(GB106): 사용가능(001), 고장(수리중)(002), 불량(미사용)(003)
 
  * 수정내용
-0) 메인화면 락카 색상표시
+1) 메인화면 락카 색상표시
 PKG_SpaLockerSalesRegistration.SP_SELECT2 추가
-PKG_SpaLockerSalesRegistration.SP_LOCKER_SELECT 수정 (※ 조건절 PAID_YN = 'N' 추가)
 
-1) 락카 일괄 저장
+2) 락카 일괄 저장
 - PKG_SpaLockerSalesRegistration.SP_POP_COMPANION_SELECT 셀렉트 컬럼만 추가
 - PKG_SpaLockerSalesRegistration.SP_DELETE2 추가
 
-2) 고정락카
+3) 고정락카
 - GFH01D 고정락카 관리 테이블 생성 
 - PKG_SPALOCKERFIXPOP 패키지 생성
 - PKG_SpaLockerSalesRegistration.SP_COMPANION_SELECT 수정 
 
-3) 고장락카
+4) 고장락카
 - GFH01B 고정락카 관리 테이블 생성 
 - PKG_SPALOCKERFIXPOP 패키지 생성
 
