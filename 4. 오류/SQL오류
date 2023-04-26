@@ -1,0 +1,5 @@
+ORA-00932: inconsistent datatypes: expected CHAR got NUMBER 
+- 일관성 없는 데이터 유형: CHAR가 필요하지만 NUMBER임
+
+ORA-01722: 수치가 부적합합니다
+- 로직 처리할 때 데이터 타입이 일치 하지 않는 경우 또는 데이터 타입이 다른 연산을 하는 경우 오류가 발생

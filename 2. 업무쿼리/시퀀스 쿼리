@@ -1,0 +1,104 @@
+기본 시퀀스 쿼리 : (NVL(MAX(TO_NUMBER(SEQ_NO)),0)+1) INTO V_SEQ_NO
+
+
+SELECT LAST_NUMBER
+FROM USER_SEQUENCES
+WHERE SEQUENCE_NAME = 'KJB_SEQ';
+
+SELECT KJB_SEQ.NEXTVAL FROM DUAL  ;
+
+
+ALTER SEQUENCE KJB_SEQ INCREMENT BY 1;
+
+
+
+-- 초기화
+DECLARE
+    V_CURRVAL NUMBER;
+    V_MINUSVAL NUMBER;
+BEGIN
+
+     SELECT LAST_NUMBER INTO V_CURRVAL
+    FROM USER_SEQUENCES
+    WHERE SEQUENCE_NAME = 'KJB_SEQ';
+
+        DBMS_OUTPUT.PUT_LINE('V_CURRVAL1 : '||V_CURRVAL);
+         EXECUTE IMMEDIATE 'ALTER SEQUENCE '|| 'KJB_SEQ' || ' INCREMENT BY -'||TO_CHAR((V_CURRVAL-1));
+        SELECT KJB_SEQ.NEXTVAL INTO V_CURRVAL FROM DUAL  ;
+        DBMS_OUTPUT.PUT_LINE('V_CURRVAL1 : '||V_CURRVAL);
+       EXECUTE IMMEDIATE 'ALTER SEQUENCE '|| 'KJB_SEQ' || ' INCREMENT BY 1';
+
+     SELECT LAST_NUMBER INTO V_CURRVAL
+    FROM USER_SEQUENCES
+    WHERE SEQUENCE_NAME = 'KJB_SEQ';
+        DBMS_OUTPUT.PUT_LINE('V_CURRVAL2 : '||V_CURRVAL);
+
+END;
+
+
+
+-- 시퀀스 생성(NVL2 활용)
+SELECT NVL2(MAX(TEMPLATE_CODE), ('PX'||(MAX(SUBSTR(TEMPLATE_CODE, 3, 10))+1)), ('PX'||TO_CHAR(SYSDATE,'YYYYMMDD')||+'00')) INTO V_TEMPLATE_CODE 
+FROM ALT01D
+WHERE CORP_CODE = P_CORP_CODE
+AND SUBSTR(TEMPLATE_CODE, 3, 8) = TO_CHAR(SYSDATE,'YYYYMMDD');
+
+
+                V_TEMPLATE_CODE               VARCHAR2(13);
+                
+                
+                
+                                -- 시퀀스 생성
+                SELECT NVL2(MAX(TEMPLATE_CODE), ('PX'||(MAX(SUBSTR(TEMPLATE_CODE, 3, 10))+1)), ('PX'||TO_CHAR(SYSDATE,'YYYYMMDD')||+'01')) INTO V_TEMPLATE_CODE 
+                FROM ALT01D
+                WHERE CORP_CODE = P_CORP_CODE
+                AND SUBSTR(TEMPLATE_CODE, 3, 8) = TO_CHAR(SYSDATE,'YYYYMMDD');
+
+
+
+
+PROCEDURE SP_SELECT_MASTER(
+                        P_CORP_CODE                        VARCHAR2      
+                    ,P_TEMPLATE_TYPE_CODE              VARCHAR2     -- 관리코드
+                    ,P_TEMPLATE_CODE                   VARCHAR2     -- 템플릿 코드
+                    ,P_TEMPLATE_NAME                   VARCHAR2     -- 템플릿 명
+                    ,P_USE_DEPARTMENT                  VARCHAR2     -- 사용부서
+                    ,P_USE_YN                          VARCHAR2     -- 사용여부
+                    ,O_RESULTLIST             OUT SYS_REFCURSOR     -- 목록,상세조회 정보 
+                    )
+IS
+    
+BEGIN
+    OPEN O_RESULTLIST FOR
+    
+    SELECT  A01M.TEMPLATE_TYPE_CODE,
+            MAX(A01M.TEMPLATE_TYPE_NAME) AS TEMPLATE_TYPE_NAME,
+            MAX(A01M.TEMPLATE_CODE) AS TEMPLATE_CODE,
+            MAX(A01M.USE_DEPARTMENT_CODE) AS USE_DEPARTMENT_CODE,
+            MAX(GET_COMMCODE(P_CORP_CODE, 'CO018',A01M.USE_DEPARTMENT_CODE)) AS USE_DEPARTMENT_NAME
+    FROM    ALT01M A01M
+    LEFT OUTER JOIN
+                (
+                    SELECT  CORP_CODE,
+                            TEMPLATE_TYPE_CODE,
+                            TEMPLATE_CODE,
+                            TEMPLATE_NAME,
+                            USE_YN
+                    FROM    ALT01D
+                    WHERE   (TEMPLATE_NAME LIKE '%'||P_TEMPLATE_NAME||'%')
+                )A01D   ON A01M.CORP_CODE = A01D.CORP_CODE
+                        AND A01M.TEMPLATE_TYPE_CODE = A01D.TEMPLATE_TYPE_CODE
+                        
+    WHERE   (A01M.CORP_CODE = P_CORP_CODE)
+    AND     (P_TEMPLATE_TYPE_CODE IS NULL OR A01M.TEMPLATE_TYPE_CODE = P_TEMPLATE_TYPE_CODE)
+    AND     (P_TEMPLATE_CODE IS NULL OR A01D.TEMPLATE_CODE = P_TEMPLATE_CODE)
+    AND     (P_TEMPLATE_NAME IS NULL OR A01D.TEMPLATE_NAME LIKE '%'||P_TEMPLATE_NAME||'%')
+    AND     (P_USE_DEPARTMENT IS NULL OR A01M.USE_DEPARTMENT_CODE = P_USE_DEPARTMENT)
+    AND     (P_USE_YN IS NULL OR A01D.USE_YN = P_USE_YN)
+    GROUP BY A01M.CORP_CODE, A01M.TEMPLATE_TYPE_CODE
+    ;
+
+
+
+                 
+   

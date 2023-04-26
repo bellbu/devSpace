@@ -1,0 +1,101 @@
+* <label> 태그
+ - <label> 요소는 for 속성을 사용하여 다른 요소와 결합(for 속성값은 결합하고자 하는 요소의 id 속성값과 같아야 함) 
+ - 결합하고자 하는 요소를 label 태그 내부에 위치시키면 for 속성을 사용하지 않더라도 해당 요소와 결합시킬 수 있음
+
+* <span> 태그
+ - <div> 태그처럼 특별한 기능을 갖고있지 않고, CSS와 함께 쓰임
+ - <div> 태그와 차이점 : inline요소, 줄 바꿈이 되지 않음
+
+* onChange : input 안의 값이 변경될 때에 이벤트 발생
+ <input id="" name="" type="file" onchange="fileCheck(this)" accept="image/gif, image/jpeg, image/png" />;
+
+ 
+* CSS 중앙 정렬의 모든 것
+1. 블록요소, 인라인요소(인라인 블록요소)의 수평 중앙정렬  
+ - 블록요소 : 자기 자신에 margin: auto;
+ - 인라인(인라인블록)는 부모요소 또는 상위요소에 text-align: center;
+ ※ float로 배치하는 것은 블록요소, 인라인요소(인라인 블록요소) 모두 적용가능    
+
+2. 자기 자신의 수평,수직 중앙정렬
+ - position, margin: auto
+
+3. 부모요소가 자식요소를 수평,수직 중앙정렬
+ - flex, grid, place-items
+
+ 1) display : flex; 
+  - justify-content(수평) : center; 
+  - align-items(수직) : center;
+
+ 2) display : grid;
+    -place-items : center;
+    
+4. 자기 자신과 인접한 요소와 수직 중앙정렬(ex img와 text 높이가 맞지 않는 경우)
+ - img {vertical-align : top, bottom, middle 주로 3가지 사용, 
+        transform : translateY() transform으로 미세하게 조절가능
+    }
+
+* transform
+ - HTML요소를 회전, 크기 조절, 기울이기, 이동 효과를 나타낼 때 사용   
+
+* display: flex
+- display: flex로 지정된 부모 요소를 flex container, 자식요소를 flex item이라고 부름
+- flex-wrap 
+ 1) nowrap(기본값): 절대로 줄바꿈 하지 않음
+ 2) wrap : 절대로 크기 변하지 않음
+
+* position
+1) static : 기본
+2) relative(부모요소) : 월래 있는 곳에서 상대적으로 이동
+3) absolute(자식요소) : relative가 있는 부모요소 안에서 이동
+4) fixed : 페이지 상에서 이동
+5) sticky : 스크롤해도 그대로 고정
+
+* flex: 증가너비(grow) 감소너비(shrink) 기본너비(basis)
+
+* CSS 가상선택자에서 단일콜론(:), 이중콜론(::) 차이점
+- 단일콜론(:) : 동적이거나 유동적이면서 언떤 요소의 전체에 영향을 줄 때 사용 ex) :hover, :first-child
+- 이중콜론(::) : 정적이면서 어떤 요소의 일부분에 영향을 줄 때 사용 ex) ::first-letter, ::before
+
+* 가상 선택자
+1) root 
+ (1) 변수선언
+  :root {
+    --변수명: 속성 값
+    --color-yellow: #fbbe28;
+  }
+
+ (2) 변수사용(var로 변수를 선언한 후 소괄호 안에 속성 값을 입력)
+  .colorBtn {
+    color: var(--color-yellow);
+  }
+
+2) active: 마우스 버튼을 누르는 순간부터 떼는 시점을 의미
+.btn_main:active{
+	background-color: var(--Btn-Main-Click);
+}
+
+3) 스크롤
+::-webkit-scrollbar {
+  /* 스크롤바 전체 영역 */
+} 
+::-webkit-scrollbar-track {
+  /* 스크롤이 움직이는 영역  */
+} 
+::-webkit-scrollbar-thumb {
+  /*  스크롤  */
+} 
+::-webkit-scrollbar-button:start:decrement, 
+::-webkit-scrollbar-button:end:increment {
+  /*  스크롤의 화살표가 포함된 영역   */
+} 
+::-webkit-scrollbar-corner {
+  /*  상하+좌우 스크롤이 만나는 공간   */
+} 
+
+4) before: 선택된 요소의 첫 번째 자식 요소(가상 요소)를 생성
+	p::before {
+	  content : '♥';
+	  color: pink;
+	}
+
+5) after: 선택된 요소의 마지막 자식 요소(가상 요소)를 생성

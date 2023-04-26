@@ -1,0 +1,13 @@
+-- org.springframework.beans.factory.BeanCreationException: 다른 controller에 동일한 url이 존재한 경우
+
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource 
+[org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Invocation of init method failed; 
+nested exception is java.lang.IllegalStateException: Ambiguous mapping. Cannot map 'waterHomeController' method 
+pulmuoneLastMile.mobile.controller.WaterHomeController#DeliveryMngm_SelectOne(HttpServletRequest, HttpServletResponse)
+to {POST /DeliveryMngm_SelectOne.do}: There is already 'mobileController' bean method
+
+
+-- java.sql.SQLException: 실행할 SQL 문은 비어 있거나 널일 수 없음(해당 프로시저를 컴파일해서 제대로 컴파일 되는지 확인)
+
+
+-- java.sql.SQLException: ORA-06550: 줄 1, 열7:PLS-00306: 'SP_SELECT1' 호출 시 인수의 갯수나 유형이 잘못되었습니다. : xml, sql 파라미터 개수가 안 맞은 경우

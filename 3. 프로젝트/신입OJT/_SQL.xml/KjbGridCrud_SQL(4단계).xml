@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="KjbGridCrud">
+	<resultMap id="KjbGridCrudMap" type="hashMap"></resultMap>
+	
+	<insert id="Insert" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_INSERT4 (
+			#{loginVO.corpCode},
+			#{userId},
+			#{gradeDate},
+			#{korean},
+			#{math},
+			#{eng},
+			#{etc},
+			#{loginVO.empNo},
+			#{loginVO.empIp},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</insert>
+	
+	<update id="Update" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_UPDATE4 (
+			#{loginVO.corpCode},
+			#{userId},
+			#{sGradeDate},
+			#{gradeDate},
+			#{korean},
+			#{math},
+			#{eng},
+			#{etc},
+			#{loginVO.empNo},
+			#{loginVO.empIp},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</update>
+	
+	<delete id="Delete" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_DELETE4 (
+			#{loginVO.corpCode},
+			#{userId},
+			#{sGradeDate},
+			#{gradeDate},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</delete>
+	
+</mapper>

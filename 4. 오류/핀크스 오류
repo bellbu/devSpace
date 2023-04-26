@@ -1,0 +1,9 @@
+-- 그리드 오류
+메세지 : 검증오류
+        [시험날짜(컬럼명)] 항목의 입력값이 유효하지 않습니다.
+        길이와 형식을 확인해주세요.
+
+해결법 : 1) 그리드 오류 메시지를 js로 검색해서 해당 메시지 함수 확인($.fn.GridSaveCheck 함수 부분 확인)
+        2) 함수에 콘솔 찍어서 오류 파악 ex) console.log(errorColName) => gradeDate / console.log(errorCode) => REGEXP  
+        3) 날짜 정규식 표현 잘못 추축 해서 그리드 템플릿 getDatePickerTemplate(true) 함수 확인
+        4) getDatePickerTemplate 함수에서 format: 'yyyy-MM-dd' 확인 (DB에서 불러오는 format: YYYYMMDD 였음) 

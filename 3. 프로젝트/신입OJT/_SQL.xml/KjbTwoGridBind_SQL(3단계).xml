@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="KjbTwoGridBind">
+	<resultMap id="KjbTwoGridBindMap" type="hashMap"></resultMap>
+	
+	<select id="Select" statementType="CALLABLE" resultType="hashmap">
+        {call PKG_OJTKJB.SP_SELECT3(
+	        #{loginVO.corpCode}
+	        ,#{sUserId}
+	        ,#{O_LIST,jdbcType=CURSOR,mode=OUT, javaType=ResultSet, resultMap=KjbTwoGridBindMap}
+        )}
+	</select>
+	
+	<insert id="Insert" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_INSERT3 (
+			#{loginVO.corpCode},
+			#{sUserId},
+			#{gradeDate},
+			#{korean},
+			#{math},
+			#{eng},
+			#{etc},
+			#{loginVO.empNo},
+			#{loginVO.empIp},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</insert>
+	
+	<update id="Update" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_UPDATE3 (
+			#{loginVO.corpCode},
+			#{sUserId},
+			#{sGradeDate},
+			#{gradeDate},
+			#{korean},
+			#{math},
+			#{eng},
+			#{etc},
+			#{loginVO.empNo},
+			#{loginVO.empIp},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</update>
+	
+	<delete id="Delete" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_DELETE3 (
+			#{loginVO.corpCode},
+			#{sUserId},
+			#{sGradeDate},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</delete>
+
+</mapper>

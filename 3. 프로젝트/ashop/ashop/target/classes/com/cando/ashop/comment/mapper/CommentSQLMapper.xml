@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cando.ashop.comment.mapper.CommentSQLMapper">
+	
+	<insert id="insertComment">
+		INSERT INTO FP_Comment VALUES(
+		FP_Comment_seq.nextval,
+		#{member_no},
+		#{board_no},
+		#{comment_content},
+		SYSDATE
+	)	
+	</insert>
+	
+	<select id="getCommentList" resultType="com.cando.ashop.vo.CommentVo">
+		SELECT * FROM FP_Comment WHERE board_no = #{no} ORDER BY comment_no ASC
+	</select>
+	
+	<delete id="deleteComment">
+		DELETE FROM FP_Comment WHERE comment_no = #{no}
+	</delete>
+	
+</mapper>

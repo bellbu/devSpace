@@ -1,0 +1,32 @@
+* 스프링 단축키
+ - import java util(임포트): Ctrl + Shift + o
+ - 블록 주석:  Ctrl + Shift + /
+ - 블록 주석 풀기: Ctrl + Shift + \
+ - 이동 후 이전에 있었던 곳으로 돌아가기: Alt + ←
+ - 다시 앞으로 이동하기: Alt + →
+ - 줄에서 맨 앞으로 이동: Home
+ - 줄에서 맨 뒤으로 이동: End
+ - 맨 위으로 이동: Ctrl + Home
+ - 맨 아래으로 이동: Ctrl + End
+ - 탭 이동: Ctrl + F6, Ctrl + Shift + F6
+ - View 간 전환: Ctrl + F7
+ - 위, 아래 빠른 이동: Page Up, Page Down
+ - 탭 이동: Ctrl + Page Up, Page Down
+ - 세로(열) 편집 : Alt + Shift + A
+
+* 토드 단축키
+ - 현재 Editor의 내용을 지우고 새로운 Editor 열기: F7 
+ - Editor에서 이전에 실행한 SQL 목록 열기: F8
+ - 단어의 모든 문자를 대문자로 변환: Ctrl + U 	  
+ - 커서가 위치한 줄 복사 : Shift + Ctrl + T
+ - 커서가 위치한 줄 잘라내기: Shift + Ctrl + Y
+ - 선택한 영역 주석 처리: Ctrl + B	  
+ - 선택한 영역 주석 해제: Shift + Ctrl + B	  	   
+ - 테이블 정보 상세보기: F4 (테이블명 위에 커서를 두고 F4키)
+ - SQL Editor창 전체화면 전환 : F2
+ - 이전 탭으로 이동: Alt + PgUp 
+ - 다음 탭으로 이동: Alt + PgDn 
+ - 세로(열) 편집 : Alt + Shift + 위or아래
+
+
+

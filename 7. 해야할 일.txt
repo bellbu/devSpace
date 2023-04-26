@@ -1,0 +1,151 @@
+완료 - 1) 회의록 작성
+완료 - 2) 그 동안 했던 업무 정리
+완료 - 3) 어제 업무 정리 getrowData
+완료 - 4) 함수 정리, DB 정리
+보류 - 5) TNS 이름 바꾸기 
+완료 - function(this) : this의 의미
+완료 - 전역변수 지역변수
+완료 - 배열(list, map)
+완료 - enctype="multipart/form-data" 의미 : 파일(<input type="file">)이 포함된 폼을 전송할 때 사용.
+완료 - 콜백함수란??
+완료 - 정규식 표현 공부 (유튜브 강의)
+
+===============================================
+
+* 프로그램 새로 설치 해보기
+
+1. DB
+ 1) 쿼리(조인 아우터 조인, inout, sql문 프리시저 문법, 스칼라, 서브 쿼리)
+ 4) 월력쿼리
+
+2. 스프링 
+ 1) @Value
+ 2) 서블릿이란??
+
+3. 자바스크립트 
+ 1) 업무필요 동강 듣기(자바스크립트, 제이쿼리) : 제로초 10강
+ 4) 프린터 공부
+
+4. 회사업무
+ 1) 쌩코드 짜보기 
+ 
+5. HTML,CSS
+
+===============================================
+
+1) 스프링 강의
+9) 소스트리 강의
+10) 깃 데이터 베이스 연결(서버)
+12) DB 콘솔, 디버깅
+21) Iterator 
+.next(), 아무 타입으로 반환할 수 있습니다. Iterator에 입력된 값들이 String이면 String 값으로 가져오는 것입니다. 
+.hasNext() boolean 타입으로 반환. 즉 "True or False"로 반환 
+23) 자바스크립트 for문 while문 별찍기
+26) 일반 세이브/그리드 세이브 서비스단 비교 
+    (1) 그리드 세이브
+	@Transactional 
+	public HashMap<String, Object> KjbGridCrud_Control(HttpServletRequest request) throws Exception {
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		JSONArray grids = CommonUtil.parseGridToJArr(request) ;
+		
+		for(int i = 0 ; i < grids.size() ; i++) {
+			JSONObject data = grids.getJSONObject(i);
+			HashMap<String, Object> param = CommonUtil.jsonToMap(data);
+						
+			if(param.containsKey("type")) {
+				if(param.get("type").equals("add")){
+					result = kjbOjtMapper.KjbGridCrud_Insert(param);
+				}else if(param.get("type").equals("edit")){
+					result = kjbOjtMapper.KjbGridCrud_Update(param);
+				}else if(param.get("type").equals("del")){
+					result = kjbOjtMapper.KjbGridCrud_Delete(param);
+					System.out.println("===============삭제===========");
+					System.out.println(param);
+				}
+			}
+			
+			if(!result.get("O_RESULT").toString().equals("1")) {
+	    		break;
+	    	}
+		}
+		return result;		
+	}
+
+    (2) 일반 세이브 
+    @Transactional 
+    public HashMap<String, Object> LockerRegistrationForm_Control(HttpServletRequest request) throws Exception {
+
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		HashMap<String, Object> param = RequestUtil.getParameter(request);
+		
+		if(param.get("type").equals("add")) {
+			result = btmSpaMapper.LockerRegistrationForm_Insert(param);
+		}else if (param.get("type").equals("edit")) {
+			result = btmSpaMapper.LockerRegistrationForm_Update(param);
+		}
+		
+		if(result.get("O_RESULT").equals("0")){
+			result.put("O_MSG", result.get("O_MSG"));
+		}
+		return result;
+
+	}
+
+29) 소스트리 깃 플로우 공부
+30) 프로그래머스 쿼리 파악하기
+WITH FILTER AS ( -- 8~10월의 최소 1개 이상인 자동차 아이디만 가져오는 것
+    SELECT CAR_ID
+       , COUNT(*) AS FILTER
+    FROM CAR_RENTAL_COMPANY_RENTAL_HISTORY
+    WHERE EXTRACT(MONTH FROM START_DATE) IN(8,9,10)
+    GROUP BY CAR_ID
+    ORDER BY CAR_ID DESC
+)
+
+SELECT EXTRACT(MONTH FROM START_DATE) AS MONTH
+       , C.CAR_ID
+       , COUNT(*) AS RECORDS
+FROM CAR_RENTAL_COMPANY_RENTAL_HISTORY C INNER JOIN FILTER F
+ON  C.CAR_ID = F.CAR_ID 
+WHERE   F.FILTER>=5 
+        AND EXTRACT(MONTH FROM START_DATE) IN (8,9,10)
+GROUP BY EXTRACT(MONTH FROM START_DATE), C.CAR_ID
+ORDER BY MONTH ASC, CAR_ID DESC
+
+
+SELECT TO_NUMBER(TO_CHAR(START_DATE,'MM')) AS MONTH, CAR_ID, COUNT(CAR_ID) AS RECORDS
+FROM CAR_RENTAL_COMPANY_RENTAL_HISTORY
+WHERE CAR_ID IN (
+                SELECT CAR_ID
+                FROM CAR_RENTAL_COMPANY_RENTAL_HISTORY
+                WHERE TO_CHAR(START_DATE,'YYYY-MM') BETWEEN '2022-08' AND '2022-10' 
+                GROUP BY CAR_ID
+                HAVING COUNT(CAR_ID) >= 5
+)
+AND TO_CHAR(START_DATE,'YYYY-MM') BETWEEN '2022-08' AND '2022-10' 
+GROUP BY TO_CHAR(START_DATE,'MM'), CAR_ID
+HAVING COUNT(CAR_ID) != 0
+ORDER BY MONTH, CAR_ID DESC
+
+31) WITH절과 VIEW테이블 차이??
+32) $(function () {} 와 $( document ).ready(function(){} 차이
+33) 포캐스팅 방식이라??
+34) iframe 태그란??
+35) iframe, parent, webkit 공부
+36) 스프링 주석기능
+37) API 개념
+38) [Error] Compilation (13: 15): PLS-00323: subprogram or cursor 'SP_SELECT' is declared in a package specification and must be defined in the package body 
+- 패키지 바디 헤드 싱크 안맞음 생긴 오류
+===================================================
+
+3월 계획
+완료 - 스프링부트 개념정리(인프런)
+정보처리기사 공부: 3월 12일
+정보처리기사 자바스크립트(제로초:119강), 
+자바(??) 
+스프링 프로젝트 강의(메타코딩 75강)
+
+소스트리 강의 4강 완료
+- 4강 다시 듣기
+
+

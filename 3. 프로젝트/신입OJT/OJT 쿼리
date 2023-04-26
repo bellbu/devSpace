@@ -1,0 +1,1448 @@
+CREATE OR REPLACE PACKAGE BODY USERVE.PKG_OJTKJB AS --PKG_ + 화면ID
+        /******************************************************************************
+
+           NAME:       SP_SELECT
+           PURPOSE:    원그리드 조회
+
+           REVISIONS:
+           Ver        Date        Author           Description
+           ---------  ----------  ---------------  ------------------------------------
+           1.0        2022-10-15      김종부       최초생성.
+        ******************************************************************************/
+            
+            -- 1단계 조회
+            PROCEDURE SP_SELECT1(
+                                 P_CORP_CODE  VARCHAR2 
+                                ,P_USER_ID   VARCHAR2
+                                ,P_ST_DATE   VARCHAR2
+                                ,P_ED_DATE   VARCHAR2
+                                ,P_SEX_NAME  VARCHAR2
+                                ,O_RESULTLIST                  OUT SYS_REFCURSOR     -- 목록,상세조회 정보 
+                                )
+            IS
+                
+            BEGIN
+                OPEN O_RESULTLIST FOR
+        
+                SELECT CORP_CODE,
+                       USER_ID,
+                       USER_PW,
+                       USER_ADDR1,
+                       USER_ADDR2,
+                       USER_HP,
+                       USER_SEX,
+                       USER_BIRTH,
+                       TO_CHAR(INS_DATE,'YYYY-MM-DD') AS INS_DATE, 
+                       TO_CHAR(UPD_DATE,'YYYY-MM-DD') AS UPD_DATE 
+                FROM OJT01M
+                WHERE CORP_CODE = P_CORP_CODE
+                AND (P_USER_ID IS NULL OR USER_ID LIKE '%' || P_USER_ID || '%')
+                AND (P_ST_DATE IS NULL AND P_ED_DATE IS NULL OR USER_BIRTH BETWEEN P_ST_DATE AND P_ED_DATE)
+                AND (P_SEX_NAME IS NULL OR ( USER_SEX = P_SEX_NAME ))
+                ORDER BY USER_ID 
+                ;
+                
+            EXCEPTION                               
+            WHEN OTHERS THEN   
+                BEGIN
+                    RETURN;
+                END;
+           
+            END;
+            
+            -- 2단계 등록
+            PROCEDURE SP_INSERT2(
+                                 P_CORP_CODE     VARCHAR2 
+                                ,P_USER_ID      VARCHAR2
+                                ,P_USER_PW      VARCHAR2
+                                ,P_USER_ADDR1   VARCHAR2
+                                ,P_USER_ADDR2   VARCHAR2
+                                ,P_USER_HP      VARCHAR2
+                                ,P_USER_SEX     VARCHAR2
+                                ,P_USER_BIRTH   VARCHAR2
+                                ,P_INS_EMP_NO   VARCHAR2
+                                ,P_INS_IP       VARCHAR2
+                                ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                                ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                                )
+            IS
+            
+            P_CNT NUMBER;
+                
+            BEGIN
+            
+                O_RESULT := '0';
+                
+                SELECT COUNT(*) INTO P_CNT
+                FROM OJT01M
+                WHERE CORP_CODE = P_CORP_CODE
+                AND USER_ID = P_USER_ID
+                ;
+            
+                IF P_CNT <> 0 THEN
+                    O_MSG := '해당 업징에 중복된 아이디가 존재합니다.';
+                    DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                    RETURN;
+                END IF;    
+            
+                INSERT INTO OJT01M (
+                                    CORP_CODE
+                                    ,USER_ID
+                                    ,USER_PW
+                                    ,USER_ADDR1
+                                    ,USER_ADDR2
+                                    ,USER_HP
+                                    ,USER_SEX
+                                    ,USER_BIRTH
+                                    ,INS_EMP_NO
+                                    ,INS_DATE
+                                    ,INS_IP
+                               ) 
+                VALUES ( 
+                        P_CORP_CODE,
+                        P_USER_ID,
+                        P_USER_PW,
+                        P_USER_ADDR1,
+                        P_USER_ADDR2,
+                        P_USER_HP,
+                        P_USER_SEX,
+                        REPLACE(P_USER_BIRTH,'-',''),
+                        P_INS_EMP_NO,
+                        SYSDATE,
+                        P_INS_IP
+                 );             
+
+                O_RESULT := '1';
+                
+            EXCEPTION                               
+            WHEN OTHERS THEN   
+                BEGIN
+                    O_MSG := SQLERRM;
+                    DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                    RETURN;
+                END;
+           
+            END;
+
+         -- 2단계 수정
+        PROCEDURE SP_UPDATE2(
+                             P_CORP_CODE     VARCHAR2 
+                            ,P_USER_ID      VARCHAR2
+                            ,P_USER_PW      VARCHAR2
+                            ,P_USER_ADDR1   VARCHAR2
+                            ,P_USER_ADDR2   VARCHAR2
+                            ,P_USER_HP      VARCHAR2
+                            ,P_USER_SEX     VARCHAR2
+                            ,P_USER_BIRTH   VARCHAR2
+                            ,P_UPD_EMP_NO   VARCHAR2
+                            ,P_UPD_IP       VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+                        
+        BEGIN
+    
+            O_RESULT := '0';
+
+            UPDATE OJT01M
+            SET    
+                   USER_ADDR1 = P_USER_ADDR1,
+                   USER_ADDR2 = P_USER_ADDR2,
+                   USER_HP = P_USER_HP,
+                   USER_SEX = P_USER_SEX,
+                   USER_BIRTH = REPLACE(P_USER_BIRTH,'-',''),
+                   UPD_EMP_NO = P_UPD_EMP_NO,
+                   UPD_DATE = SYSDATE,
+                   UPD_IP = P_UPD_IP
+            WHERE CORP_CODE = P_CORP_CODE
+            AND USER_ID = P_USER_ID
+            ;
+                     
+            O_RESULT := '1';
+                
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+                BEGIN
+                    O_MSG := SQLERRM;
+                    DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                    RETURN;
+                END;
+           
+        END;    
+            
+        
+        -- 2단계 삭제         
+        PROCEDURE SP_DELETE2(
+                            P_CORP_CODE                 VARCHAR2
+                            ,P_USER_ID                  VARCHAR2
+                            ,O_RESULT                      IN OUT VARCHAR2     -- 결과값[성공:1 오류:0] 
+                            ,O_MSG                         IN OUT VARCHAR2     -- 오류MSG  
+                            )
+        IS
+                
+        BEGIN
+        
+            O_RESULT := '0';
+               
+            DELETE FROM OJT01M 
+            WHERE CORP_CODE = P_CORP_CODE                      
+            AND USER_ID = P_USER_ID                    
+            ; 
+        
+            O_RESULT := '1';
+                
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                O_MSG := SQLERRM;
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END;
+           
+        END; 
+        
+        
+        
+        -- 3단계 조회
+        PROCEDURE SP_SELECT3(
+                            P_CORP_CODE     VARCHAR2 
+                            ,P_USER_ID      VARCHAR2
+                            ,O_RESULTLIST   OUT SYS_REFCURSOR     -- 목록,상세조회 정보 
+                            )                       
+        IS
+            
+        BEGIN
+            OPEN O_RESULTLIST FOR
+    
+            SELECT CORP_CODE,
+                   USER_ID,
+                   KOREAN,
+                   MATH,
+                   ENG,
+                   ETC,
+                   TO_CHAR(INS_DATE,'YYYY-MM-DD') AS INS_DATE, 
+                   TO_CHAR(UPD_DATE,'YYYY-MM-DD') AS UPD_DATE,
+                   TO_CHAR(TO_DATE(GRADE_DATE, 'YYYYMMDD'), 'YYYY-MM-DD') AS GRADE_DATE,
+                   TO_CHAR(TO_DATE(GRADE_DATE, 'YYYYMMDD'), 'YYYY-MM-DD') AS S_GRADE_DATE  
+            FROM OJT01D
+            WHERE CORP_CODE = P_CORP_CODE
+            AND USER_ID = P_USER_ID
+            ORDER BY GRADE_DATE  
+            ;
+            
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                RETURN;
+            END;
+       
+        END;
+        
+        -- 3단계 등록
+        PROCEDURE SP_INSERT3(
+                             P_CORP_CODE    VARCHAR2 
+                            ,P_USER_ID      VARCHAR2
+                            ,P_GRADE_DATE   VARCHAR2
+                            ,P_SCHOOL_CODE  VARCHAR2
+                            ,P_KOREAN       VARCHAR2
+                            ,P_MATH         VARCHAR2
+                            ,P_ENG          VARCHAR2
+                            ,P_ETC          VARCHAR2
+                            ,P_INS_EMP_NO   VARCHAR2
+                            ,P_INS_IP       VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+        
+        P_CNT NUMBER;
+            
+        BEGIN
+        
+            O_RESULT := '0';
+            
+            -- 빈값 유효성 체크
+            IF P_GRADE_DATE IS NULL THEN
+                O_MSG := '시험날짜가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+                
+            IF P_KOREAN IS NULL THEN
+                O_MSG := '국어 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_MATH IS NULL THEN
+                O_MSG := '수학 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_ENG IS NULL THEN
+                O_MSG := '영어 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_ETC IS NULL THEN
+                O_MSG := '예체능 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+                        
+            --시험날짜 중복 유효성 체크          
+            SELECT COUNT(*) INTO P_CNT
+            FROM OJT01D
+            WHERE CORP_CODE = P_CORP_CODE
+            AND USER_ID = P_USER_ID
+            AND GRADE_DATE = REPLACE(P_GRADE_DATE,'-','')
+            ;
+        
+            IF P_CNT <> 0 THEN
+                O_MSG := '해당 시험날짜에 성적이 존재합니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;    
+        
+            INSERT INTO OJT01D (
+                                CORP_CODE
+                                ,USER_ID
+                                ,SCHOOL_CODE
+                                ,KOREAN
+                                ,MATH
+                                ,ENG
+                                ,ETC
+                                ,INS_EMP_NO
+                                ,INS_DATE
+                                ,INS_IP
+                                ,GRADE_DATE
+                           ) 
+            VALUES ( 
+                    P_CORP_CODE,
+                    P_USER_ID,
+                    P_SCHOOL_CODE,
+                    P_KOREAN,
+                    P_MATH,
+                    P_ENG,
+                    P_ETC,
+                    P_INS_EMP_NO,
+                    SYSDATE,
+                    P_INS_IP,
+                    REPLACE(P_GRADE_DATE,'-','')
+             );             
+
+            O_RESULT := '1';
+            
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                O_MSG := SQLERRM;
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END;
+       
+        END;        
+        
+        
+        
+         -- 3단계 수정
+        PROCEDURE SP_UPDATE3(
+                             P_CORP_CODE    VARCHAR2 
+                            ,P_USER_ID      VARCHAR2
+                            ,P_sGRADE_DATE   VARCHAR2
+                            ,P_GRADE_DATE   VARCHAR2
+                            ,P_SCHOOL_CODE  VARCHAR2
+                            ,P_KOREAN       VARCHAR2
+                            ,P_MATH         VARCHAR2
+                            ,P_ENG          VARCHAR2
+                            ,P_ETC          VARCHAR2
+                            ,P_UPD_EMP_NO   VARCHAR2
+                            ,P_UPD_IP       VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+        
+        P_CNT NUMBER;
+                        
+        BEGIN
+    
+            O_RESULT := '0';
+            
+            -- 빈값 유효성 체크
+            IF P_GRADE_DATE IS NULL THEN
+                O_MSG := '시험날짜가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+                
+            IF P_KOREAN IS NULL THEN
+                O_MSG := '국어 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_MATH IS NULL THEN
+                O_MSG := '수학 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_ENG IS NULL THEN
+                O_MSG := '영어 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_ETC IS NULL THEN
+                O_MSG := '예체능 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            -- 시험날짜 중복 유효성 체크
+            IF REPLACE(P_sGRADE_DATE,'-','') <> REPLACE(P_GRADE_DATE,'-','') THEN
+                SELECT COUNT(*) INTO P_CNT
+                FROM OJT01D
+                WHERE 
+                        CORP_CODE = P_CORP_CODE 
+                        AND USER_ID = P_USER_ID 
+                        AND GRADE_DATE = REPLACE(P_GRADE_DATE,'-','');
+            END IF;            
+        
+            IF P_CNT <> 0 THEN
+                O_MSG := '해당 시험날짜에 성적이 존재합니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;                
+
+            UPDATE OJT01D
+            SET    
+                   GRADE_DATE = REPLACE(P_GRADE_DATE,'-',''),
+                   KOREAN = P_KOREAN,
+                   MATH = P_MATH,
+                   ENG = P_ENG,
+                   ETC = P_ETC,
+                   UPD_EMP_NO = P_UPD_EMP_NO,
+                   UPD_DATE = SYSDATE,
+                   UPD_IP = P_UPD_IP
+            WHERE CORP_CODE = P_CORP_CODE
+            AND USER_ID = P_USER_ID
+            AND GRADE_DATE = REPLACE(P_sGRADE_DATE,'-','')
+            ;
+                     
+            O_RESULT := '1';
+                
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+                BEGIN
+                    O_MSG := SQLERRM;
+                    DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                    RETURN;
+                END;
+           
+        END;            
+        
+        
+        
+        -- 3단계 삭제         
+        PROCEDURE SP_DELETE3(
+                            P_CORP_CODE    VARCHAR2 
+                            ,P_USER_ID      VARCHAR2
+                            ,P_sGRADE_DATE   VARCHAR2
+                            ,P_SCHOOL_CODE  VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+                
+        BEGIN
+        
+            O_RESULT := '0';
+            
+                        
+            DELETE FROM OJT01D 
+            WHERE CORP_CODE = P_CORP_CODE                      
+            AND USER_ID = P_USER_ID
+            AND (GRADE_DATE = REPLACE(P_sGRADE_DATE,'-','') OR GRADE_DATE IS NULL)                  
+            ; 
+        
+            O_RESULT := '1';
+                
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                O_MSG := SQLERRM;
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END;
+           
+        END;   
+        
+        
+        
+        
+        -- 4단계 등록
+        PROCEDURE SP_INSERT4(
+                             P_CORP_CODE    VARCHAR2 
+                            ,P_USER_ID      VARCHAR2
+                            ,P_GRADE_DATE   VARCHAR2
+                            ,P_KOREAN       VARCHAR2
+                            ,P_MATH         VARCHAR2
+                            ,P_ENG          VARCHAR2
+                            ,P_ETC          VARCHAR2
+                            ,P_INS_EMP_NO   VARCHAR2
+                            ,P_INS_IP       VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+        
+        P_CNT NUMBER;
+            
+        BEGIN
+        
+            O_RESULT := '0';
+            
+            -- 빈값 유효성 체크
+            IF P_GRADE_DATE IS NULL THEN
+                O_MSG := '시험날짜가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+                
+            IF P_KOREAN IS NULL THEN
+                O_MSG := '국어 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_MATH IS NULL THEN
+                O_MSG := '수학 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_ENG IS NULL THEN
+                O_MSG := '영어 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_ETC IS NULL THEN
+                O_MSG := '예체능 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            -- 시험날짜 중복 유효성 체크
+            SELECT COUNT(*) INTO P_CNT
+            FROM OJT01D
+            WHERE CORP_CODE = P_CORP_CODE
+            AND USER_ID = P_USER_ID
+            AND GRADE_DATE = REPLACE(P_GRADE_DATE,'-','')
+            ;
+        
+            IF P_CNT <> 0 THEN
+                O_MSG := '해당 시험날짜에 성적이 존재합니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;    
+        
+            INSERT INTO OJT01D (
+                                CORP_CODE
+                                ,USER_ID
+                                ,KOREAN
+                                ,MATH
+                                ,ENG
+                                ,ETC
+                                ,INS_EMP_NO
+                                ,INS_DATE
+                                ,INS_IP
+                                ,GRADE_DATE
+                           ) 
+            VALUES ( 
+                    P_CORP_CODE,
+                    P_USER_ID,
+                    P_KOREAN,
+                    P_MATH,
+                    P_ENG,
+                    P_ETC,
+                    P_INS_EMP_NO,
+                    SYSDATE,
+                    P_INS_IP,
+                    REPLACE(P_GRADE_DATE,'-','')
+             );             
+
+            O_RESULT := '1';
+            
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                O_MSG := SQLERRM;
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END;
+       
+        END;    
+        
+        
+        
+        -- 4단계 수정
+        PROCEDURE SP_UPDATE4(
+                             P_CORP_CODE    VARCHAR2 
+                            ,P_USER_ID      VARCHAR2
+                            ,P_sGRADE_DATE   VARCHAR2
+                            ,P_GRADE_DATE   VARCHAR2
+                            ,P_KOREAN       VARCHAR2
+                            ,P_MATH         VARCHAR2
+                            ,P_ENG          VARCHAR2
+                            ,P_ETC          VARCHAR2
+                            ,P_UPD_EMP_NO   VARCHAR2
+                            ,P_UPD_IP       VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+        
+        P_CNT NUMBER;
+                                
+        BEGIN
+    
+            O_RESULT := '0';
+            
+            -- 빈값 유효성 체크
+            IF P_GRADE_DATE IS NULL THEN
+                O_MSG := '시험날짜가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+                
+            IF P_KOREAN IS NULL THEN
+                O_MSG := '국어 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_MATH IS NULL THEN
+                O_MSG := '수학 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_ENG IS NULL THEN
+                O_MSG := '영어 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+            
+            IF P_ETC IS NULL THEN
+                O_MSG := '예체능 점수가 입력되지 않았습니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;
+
+
+            -- 시험날짜 중복 유효성 체크
+            IF REPLACE(P_sGRADE_DATE,'-','') <> REPLACE(P_GRADE_DATE,'-','') THEN
+                SELECT COUNT(*) INTO P_CNT
+                FROM OJT01D
+                WHERE 
+                        CORP_CODE = P_CORP_CODE 
+                        AND USER_ID = P_USER_ID 
+                        AND GRADE_DATE = REPLACE(P_GRADE_DATE,'-','');
+            END IF;            
+        
+            IF P_CNT <> 0 THEN
+                O_MSG := '해당 시험날짜에 성적이 존재합니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;                
+
+            UPDATE OJT01D
+            SET    
+                   GRADE_DATE = REPLACE(P_GRADE_DATE,'-',''),
+                   KOREAN = P_KOREAN,
+                   MATH = P_MATH,
+                   ENG = P_ENG,
+                   ETC = P_ETC,
+                   UPD_EMP_NO = P_UPD_EMP_NO,
+                   UPD_DATE = SYSDATE,
+                   UPD_IP = P_UPD_IP
+            WHERE CORP_CODE = P_CORP_CODE
+            AND USER_ID = P_USER_ID
+            AND GRADE_DATE = REPLACE(P_sGRADE_DATE,'-','')
+            ;
+                     
+            O_RESULT := '1';
+                
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+                BEGIN
+                    O_MSG := SQLERRM;
+                    DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                    RETURN;
+                END;
+           
+        END;         
+        
+        
+        -- 4단계 삭제         
+        PROCEDURE SP_DELETE4(
+                            P_CORP_CODE    VARCHAR2 
+                            ,P_USER_ID      VARCHAR2
+                            ,P_sGRADE_DATE   VARCHAR2
+                            ,P_GRADE_DATE   VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+                
+        BEGIN
+        
+            O_RESULT := '0';
+               
+            DELETE FROM OJT01D 
+            WHERE CORP_CODE = P_CORP_CODE                      
+            AND USER_ID = P_USER_ID
+            AND GRADE_DATE = REPLACE(P_sGRADE_DATE,'-','')                 
+            ; 
+        
+            O_RESULT := '1';
+                
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                O_MSG := SQLERRM;
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END;
+           
+        END;     
+        
+        
+        
+        -- 5단계 조회
+        PROCEDURE SP_SELECT5(
+                             P_CORP_CODE      VARCHAR2 
+                            ,P_SCHOOL_CODE   VARCHAR2
+                            ,P_USER_ID       VARCHAR2
+                            ,O_RESULTLIST    OUT SYS_REFCURSOR     -- 목록,상세조회 정보 
+                            )
+        IS
+            
+        BEGIN
+            OPEN O_RESULTLIST FOR
+    
+            SELECT CORP_CODE,
+                   SCHOOL_CODE,
+                   USER_ID,
+                   USER_PW,
+                   USER_HP,
+                   USER_ADDR1,
+                   USER_ADDR2,
+                   USER_SEX,
+                   GET_COMMCODE(P_CORP_CODE,'RS005',USER_SEX) AS USER_SEX_NAME, 
+                   USER_BIRTH,
+                   TO_CHAR(INS_DATE,'YYYY-MM-DD') AS INS_DATE, 
+                   TO_CHAR(UPD_DATE,'YYYY-MM-DD') AS UPD_DATE 
+            FROM OJT01M
+            WHERE CORP_CODE = P_CORP_CODE
+            AND (P_SCHOOL_CODE IS NULL OR SCHOOL_CODE = P_SCHOOL_CODE)
+            AND (P_USER_ID IS NULL OR UPPER(USER_ID) LIKE '%' || UPPER(P_USER_ID) || '%')
+            ORDER BY SCHOOL_CODE, USER_ID  
+            ;
+            
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                RETURN;
+            END;
+       
+        END;         
+        
+        
+        -- 5단계 등록
+        PROCEDURE SP_INSERT5(
+                             P_CORP_CODE    VARCHAR2
+                            ,P_SCHOOL_CODE  VARCHAR2 
+                            ,P_USER_ID      VARCHAR2
+                            ,P_USER_PW      VARCHAR2
+                            ,P_USER_HP      VARCHAR2
+                            ,P_USER_ADDR1   VARCHAR2
+                            ,P_USER_ADDR2   VARCHAR2
+                            ,P_USER_SEX     VARCHAR2
+                            ,P_USER_BIRTH   VARCHAR2
+                            ,P_INS_EMP_NO   VARCHAR2
+                            ,P_INS_IP       VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+        
+        P_CNT NUMBER;
+            
+        BEGIN
+        
+            O_RESULT := '0';
+            
+            SELECT COUNT(*) INTO P_CNT
+            FROM OJT01M
+            WHERE CORP_CODE = P_CORP_CODE
+            AND SCHOOL_CODE = P_SCHOOL_CODE
+            AND UPPER(USER_ID) = UPPER(P_USER_ID)
+            ;
+        
+            IF P_CNT <> 0 THEN
+                O_MSG := '해당 학교에 중복된 아이디가 존재합니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;    
+        
+            INSERT INTO OJT01M (
+                                CORP_CODE
+                                ,SCHOOL_CODE
+                                ,USER_ID
+                                ,USER_PW
+                                ,USER_HP
+                                ,USER_ADDR1
+                                ,USER_ADDR2
+                                ,USER_SEX
+                                ,USER_BIRTH
+                                ,INS_EMP_NO
+                                ,INS_DATE
+                                ,INS_IP
+                           ) 
+            VALUES ( 
+                    P_CORP_CODE,
+                    P_SCHOOL_CODE,
+                    P_USER_ID,
+                    P_USER_PW,
+                    P_USER_HP,
+                    P_USER_ADDR1,
+                    P_USER_ADDR2,
+                    P_USER_SEX,
+                    REPLACE(P_USER_BIRTH,'-',''),
+                    P_INS_EMP_NO,
+                    SYSDATE,
+                    P_INS_IP
+             );             
+
+            O_RESULT := '1';
+            
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                O_MSG := SQLERRM;
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END;
+       
+        END;      
+        
+        
+         -- 5단계 수정
+        PROCEDURE SP_UPDATE5(
+                             P_CORP_CODE    VARCHAR2
+                            ,P_ORGSCHOOL_CODE  VARCHAR2
+                            ,P_SCHOOL_CODE  VARCHAR2  
+                            ,P_USER_ID      VARCHAR2
+                            ,P_USER_PW      VARCHAR2
+                            ,P_USER_HP      VARCHAR2
+                            ,P_USER_ADDR1   VARCHAR2
+                            ,P_USER_ADDR2   VARCHAR2
+                            ,P_USER_SEX     VARCHAR2
+                            ,P_USER_BIRTH   VARCHAR2
+                            ,P_UPD_EMP_NO   VARCHAR2
+                            ,P_UPD_IP       VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+        
+        P_CNT NUMBER; 
+                       
+        BEGIN
+    
+            O_RESULT := '0';
+
+            IF P_ORGSCHOOL_CODE <> P_SCHOOL_CODE THEN            
+                SELECT COUNT(*) INTO P_CNT
+                FROM OJT01M
+                WHERE CORP_CODE = P_CORP_CODE
+                AND SCHOOL_CODE = P_SCHOOL_CODE
+                AND UPPER(USER_ID) = UPPER(P_USER_ID);
+            END IF;            
+        
+            IF P_CNT <> 0 THEN
+                O_MSG := '해당 학교에 중복된 아이디가 존재합니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;    
+
+            UPDATE OJT01M
+            SET    
+                   SCHOOL_CODE = P_SCHOOL_CODE,
+                   USER_PW = P_USER_PW,
+                   USER_HP = P_USER_HP,
+                   USER_ADDR1 = P_USER_ADDR1,
+                   USER_ADDR2 = P_USER_ADDR2,
+                   USER_SEX = P_USER_SEX,
+                   USER_BIRTH = REPLACE(P_USER_BIRTH,'-',''),
+                   UPD_EMP_NO = P_UPD_EMP_NO,
+                   UPD_DATE = SYSDATE,
+                   UPD_IP = P_UPD_IP
+            WHERE CORP_CODE = P_CORP_CODE
+            AND SCHOOL_CODE = P_ORGSCHOOL_CODE 
+            AND USER_ID = P_USER_ID
+            ;
+                     
+            O_RESULT := '1';
+                
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+                BEGIN
+                    O_MSG := SQLERRM;
+                    DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                    RETURN;
+                END;
+           
+        END;   
+        
+        
+        -- 6단계 학교리스트 조회
+        PROCEDURE SELECT_SCHOOLLIST(
+                                    P_CORP_CODE     VARCHAR2 
+                                    ,P_sSCHOOL_CODE  VARCHAR2
+                                    ,O_RESULTLIST   OUT SYS_REFCURSOR     -- 목록,상세조회 정보 
+                                    )                       
+        IS
+            
+        BEGIN
+            OPEN O_RESULTLIST FOR
+    
+            SELECT   DETAIL AS SCHOOL_CODE,
+					 DETAIL_NAME AS SCHOOL_NAME
+           	FROM COZ10S
+            WHERE CORP_CODE = P_CORP_CODE
+            AND (P_sSCHOOL_CODE IS NULL OR DETAIL = P_sSCHOOL_CODE)				--널값검색방지
+            AND HEAD = 'KJB01'
+            AND DETAIL != '*'
+            AND USE_YN = 'Y'
+            ORDER BY DETAIL
+            ;
+            
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                RETURN;
+            END;
+       
+        END; 
+        
+          
+        -- 6단계 유저리스트 조회
+        PROCEDURE SELECT_USERLIST(
+                                  P_CORP_CODE     VARCHAR2
+                                  ,P_sUSER_ID      VARCHAR2     --검색 아이디
+                                  ,P_SCHOOL_CODE     VARCHAR2   -- 선택 그리드 학교코드
+                                  ,O_RESULTLIST   OUT SYS_REFCURSOR     -- 목록,상세조회 정보 
+                                 )                       
+        IS
+            
+        BEGIN
+            OPEN O_RESULTLIST FOR
+    
+            SELECT USER_ID
+            FROM OJT01M
+            WHERE CORP_CODE = P_CORP_CODE
+            AND (P_sUSER_ID IS NULL OR UPPER(USER_ID) LIKE '%' || UPPER(P_sUSER_ID) || '%')
+            AND SCHOOL_CODE = P_SCHOOL_CODE
+            ORDER BY USER_ID    
+            ;
+                 
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                RETURN;
+            END;
+       
+        END;
+        
+        
+        -- 6단계 성적리스트 조회
+        PROCEDURE SELECT_SCORELIST(
+                                    P_CORP_CODE      VARCHAR2
+                                    ,P_SCHOOL_CODE   VARCHAR2
+                                    ,P_USER_ID       VARCHAR2
+                                    ,O_RESULTLIST    OUT SYS_REFCURSOR     -- 목록,상세조회 정보 
+                                   )                       
+        IS
+            
+        BEGIN
+            OPEN O_RESULTLIST FOR
+           SELECT TO_CHAR(TO_DATE(GRADE_DATE, 'YYYYMMDD'), 'YYYY-MM-DD') AS GRADE_DATE,
+                  USER_ID,
+                  SCHOOL_CODE,
+                  KOREAN,
+                  MATH,
+                  ENG,
+                  ETC,
+                  NVL(KOREAN,0)+NVL(MATH,0)+NVL(ENG,0)+NVL(ETC,0) AS SUM_SCORE,
+                 (NVL(KOREAN,0)+NVL(MATH,0)+NVL(ENG,0)+NVL(ETC,0))/4 AS AVG_SCORE
+            FROM OJT01D
+            WHERE CORP_CODE = P_CORP_CODE
+            AND SCHOOL_CODE = P_SCHOOL_CODE
+            AND USER_ID = P_USER_ID
+            ORDER BY GRADE_DATE  
+            ;
+            
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                RETURN;
+            END;
+       
+        END;
+        
+        -- 6단계 팝업 조회
+        PROCEDURE SELECT_POPUP(
+                                  P_CORP_CODE     VARCHAR2
+                                  ,P_sSCHOOL_CODE      VARCHAR2
+                                  ,P_sUSER_ID      VARCHAR2     --검색 아이디
+                                  ,O_RESULTLIST   OUT SYS_REFCURSOR     -- 목록,상세조회 정보 
+                                 )                       
+        IS
+            
+        BEGIN
+            OPEN O_RESULTLIST FOR
+    
+            SELECT SCHOOL_CODE,
+                   USER_ID
+            FROM OJT01M
+            WHERE CORP_CODE = P_CORP_CODE
+            AND (P_sSCHOOL_CODE IS NULL OR SCHOOL_CODE = P_sSCHOOL_CODE)
+            AND (P_sUSER_ID IS NULL OR UPPER(USER_ID) LIKE '%' || UPPER(P_sUSER_ID) || '%')
+            ORDER BY SCHOOL_CODE, USER_ID
+            ;
+                 
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                RETURN;
+            END;
+       
+        END;
+        
+        
+        -- 7단계 조회
+        PROCEDURE SP_SELECT7(
+                             P_CORP_CODE      VARCHAR2 
+                            ,P_sUPJANG_CODE   VARCHAR2
+                            ,P_sST_DATE       VARCHAR2
+                            ,P_sED_DATE       VARCHAR2
+                            ,P_sGSC_NAME      VARCHAR2
+                            ,P_sROOM_NO       VARCHAR2
+                            ,P_sCCO_STATUS    VARCHAR2
+                            ,O_RESULTLIST                  OUT SYS_REFCURSOR     -- 목록,상세조회 정보 
+                            )
+        IS
+            
+        BEGIN
+            OPEN O_RESULTLIST FOR
+    
+            SELECT RESERV_NO
+                   ,RESERV_SEQ
+                   ,GSC_NAME
+                   ,GSC_TEL_NO
+                   ,CCI_DATE
+                   ,STAYIN_DAY_CNT
+                   ,CCO_DATE
+                   ,CCO_STATUS
+                   ,ROOM_TYPE
+                   ,ROOM_NO
+                   ,CHECKOUT_YMD
+                   ,UPJANG_CODE
+            FROM RBA01M
+            WHERE CORP_CODE = P_CORP_CODE
+            AND (P_sUPJANG_CODE IS NULL OR UPJANG_CODE = P_sUPJANG_CODE)  
+            AND (REPLACE(P_sST_DATE,'-','') IS NULL AND REPLACE(P_sED_DATE,'-','') IS NULL OR CCI_DATE BETWEEN REPLACE(P_sST_DATE,'-','') AND REPLACE(P_sED_DATE,'-','')) 
+            AND (P_sGSC_NAME IS NULL OR GSC_NAME LIKE '%' || P_sGSC_NAME || '%')
+            AND (P_sROOM_NO IS NULL OR ROOM_NO LIKE '%' || P_sROOM_NO || '%')
+            AND (P_sCCO_STATUS IS NULL OR CCO_STATUS = P_sCCO_STATUS)
+            ORDER BY RESERV_NO, RESERV_SEQ, CCI_DATE;
+            
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                RETURN;
+            END;
+       
+        END;  
+        
+       
+        -- 7단계 등록
+        PROCEDURE SP_INSERT7(
+                             P_CORP_CODE       VARCHAR2 
+                            ,P_UPJANG_CODE     VARCHAR2
+                            ,P_GSC_NAME        VARCHAR2
+                            ,P_GSC_TEL_NO      VARCHAR2
+                            ,P_ROOM_TYPE       VARCHAR2
+                            ,P_ROOM_NO         VARCHAR2
+                            ,P_CCI_DATE        VARCHAR2
+                            ,P_STAYIN_DAY_CNT  VARCHAR2
+                            ,P_CCO_DATE        VARCHAR2
+                            ,P_INS_EMP_NO      VARCHAR2
+                            ,P_INS_IP          VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+            
+            P_CNT NUMBER;
+        
+            V_RESERV_NO         VARCHAR2(10);      -- 등록할 예약번호
+            V_RESERV_SEQ        NUMBER;    -- 등록할 순번
+            
+            P_RESERV_CNT NUMBER;     
+                       
+            V_ROOM_AMT NUMBER;
+            
+        BEGIN
+        
+            O_RESULT := '0';
+            
+            -- 객실 해당일자에 예약 조회
+            SELECT COUNT(*) INTO P_CNT
+            FROM RBA01M
+            WHERE CORP_CODE = P_CORP_CODE
+            AND UPJANG_CODE = P_UPJANG_CODE  
+            AND ROOM_TYPE = P_ROOM_TYPE
+            AND ROOM_NO = P_ROOM_NO
+            AND ((CCI_DATE BETWEEN REPLACE(P_CCI_DATE,'-','') AND REPLACE(P_CCO_DATE,'-','')) OR (CCO_DATE BETWEEN REPLACE(P_CCI_DATE,'-','') AND REPLACE(P_CCO_DATE,'-',''))) 
+            AND CCO_STATUS = 'N';
+            
+            IF P_CNT <> 0 THEN
+                O_MSG := '해당 일자에 예약중인 객실이 존재합니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;  
+            
+            
+            -- 해당일자 투숙객명 중복 카운트
+            SELECT COUNT(*) INTO P_RESERV_CNT  
+            FROM RBA01M
+            WHERE CORP_CODE = P_CORP_CODE
+            AND UPJANG_CODE = P_UPJANG_CODE
+            AND CCI_DATE = REPLACE(P_CCI_DATE,'-','')
+            AND GSC_NAME = P_GSC_NAME;
+            
+            
+            -- 해당일자에 투숙객명 존재하는 경우 순번만 +1
+            IF P_RESERV_CNT <> 0 THEN
+                SELECT MAX(RESERV_NO) INTO V_RESERV_NO
+                FROM RBA01M
+                WHERE CORP_CODE = P_CORP_CODE
+                AND UPJANG_CODE = P_UPJANG_CODE
+                AND CCI_DATE = REPLACE(P_CCI_DATE,'-','')
+                AND GSC_NAME = P_GSC_NAME;
+            ELSE
+                SELECT NVL(MAX(RESERV_NO),(TO_CHAR(SYSDATE, 'YYYYMMDD')||+'00')) + 1 INTO V_RESERV_NO 
+                FROM RBA01M
+                WHERE CORP_CODE = P_CORP_CODE
+                AND SUBSTR(RESERV_NO,1,8) = TO_CHAR(SYSDATE, 'YYYYMMDD')
+                ORDER BY RESERV_NO DESC;
+            END IF;
+            
+            
+             --순번 쿼리
+            SELECT
+             NVL(MAX(RESERV_SEQ), 0) + 1 INTO V_RESERV_SEQ
+            FROM RBA01M
+            WHERE CORP_CODE = P_CORP_CODE
+            AND RESERV_NO = V_RESERV_NO;
+            
+            
+            INSERT INTO RBA01M (
+                                CORP_CODE
+                                ,UPJANG_CODE
+                                ,RESERV_NO
+                                ,RESERV_SEQ
+                                ,GSC_NAME 
+                                ,GSC_TEL_NO
+                                ,ROOM_TYPE
+                                ,ROOM_NO 
+                                ,CCI_DATE
+                                ,STAYIN_DAY_CNT
+                                ,CCO_DATE 
+                                ,CCO_STATUS
+                                ,INS_EMP_NO
+                                ,INS_DATE
+                                ,INS_IP
+                           ) 
+            VALUES ( 
+                    P_CORP_CODE,
+                    P_UPJANG_CODE,
+                    V_RESERV_NO,
+                    V_RESERV_SEQ,
+                    P_GSC_NAME,
+                    P_GSC_TEL_NO,
+                    P_ROOM_TYPE,
+                    P_ROOM_NO,
+                    REPLACE(P_CCI_DATE,'-',''),
+                    P_STAYIN_DAY_CNT,
+                    REPLACE(P_CCO_DATE,'-',''),
+                    'N',
+                    P_INS_EMP_NO,
+                    SYSDATE,
+                    P_INS_IP
+             );      
+            
+            --입실객실료 등록
+            INSERT INTO RBA05D 
+            (CORP_CODE, RESERV_NO, RESERV_SEQ, STAYIN_DATE, ROOM_TYPE, SEASON_CODE, DAY_TYPE_CODE, RATE_CODE, ROOM_AMT, INS_EMP_NO, INS_DATE, INS_IP)
+            SELECT P_CORP_CODE, V_RESERV_NO, V_RESERV_SEQ, SALE_DATE, P_ROOM_TYPE, '000', '000', 'A002', ROUND(DBMS_RANDOM.VALUE(1,1000000)), P_INS_EMP_NO, SYSDATE, P_INS_IP
+            FROM BSH01M
+            WHERE CORP_CODE = P_CORP_CODE
+            AND CALENDAR_CODE = '200'
+            AND SALE_DATE BETWEEN REPLACE(P_CCI_DATE,'-','') AND REPLACE(P_CCO_DATE,'-','')-1
+            ; 
+            
+            --입실객실료 합산
+            SELECT SUM(ROOM_AMT) INTO V_ROOM_AMT
+            FROM RBA05D
+            WHERE CORP_CODE = '01'
+            AND RESERV_NO = V_RESERV_NO
+            AND RESERV_SEQ = V_RESERV_SEQ
+            GROUP BY RESERV_NO, RESERV_SEQ
+            ;
+            
+            UPDATE RBA01M 
+            SET    
+                   ACTUAL_RATE = V_ROOM_AMT  
+            WHERE CORP_CODE = P_CORP_CODE
+            AND UPJANG_CODE = P_UPJANG_CODE
+            AND RESERV_NO = V_RESERV_NO
+            AND RESERV_SEQ = V_RESERV_SEQ
+            ;
+
+            O_RESULT := '1';
+            
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+            BEGIN
+                O_MSG := SQLERRM;
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END;
+       
+        END;  
+        
+        
+        -- 7단계 수정
+        PROCEDURE SP_UPDATE7(
+                             P_CORP_CODE       VARCHAR2 
+                            ,P_UPJANG_CODE     VARCHAR2
+                            ,P_RESERV_NO       VARCHAR2
+                            ,P_RESERV_SEQ      VARCHAR2
+                            ,P_GSC_NAME        VARCHAR2
+                            ,P_GSC_TEL_NO      VARCHAR2
+                            ,P_ROOM_TYPE       VARCHAR2
+                            ,P_ROOM_NO         VARCHAR2
+                            ,P_ORGCCI_DATE        VARCHAR2
+                            ,P_CCI_DATE        VARCHAR2
+                            ,P_STAYIN_DAY_CNT  VARCHAR2
+                            ,P_ORGCCO_DATE        VARCHAR2
+                            ,P_CCO_DATE        VARCHAR2
+                            ,P_UPD_EMP_NO      VARCHAR2
+                            ,P_UPD_IP          VARCHAR2
+                            ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                            ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+        
+        P_CNT NUMBER; 
+        V_ROOM_AMT NUMBER;
+                        
+        BEGIN
+    
+            O_RESULT := '0';
+            
+           
+            SELECT COUNT(*) INTO P_CNT
+            FROM RBA01M
+            WHERE CORP_CODE = P_CORP_CODE
+            AND UPJANG_CODE = P_UPJANG_CODE  
+            AND (RESERV_NO <> P_RESERV_NO OR RESERV_SEQ <> P_RESERV_SEQ)
+            AND ROOM_TYPE = P_ROOM_TYPE
+            AND ROOM_NO = P_ROOM_NO
+            AND ((CCI_DATE BETWEEN REPLACE(P_CCI_DATE,'-','') AND REPLACE(P_CCO_DATE,'-','')) OR (CCO_DATE BETWEEN REPLACE(P_CCI_DATE,'-','') AND REPLACE(P_CCO_DATE,'-',''))) 
+            AND CCO_STATUS = 'N';
+           
+            
+            IF P_CNT <> 0 THEN
+                O_MSG := '해당 일자에 재실중인 객실이 존재합니다.';
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END IF;    
+            
+            --입실, 퇴실일자 변경된 경우
+            IF P_ORGCCI_DATE <> REPLACE(P_CCI_DATE,'-','') OR P_ORGCCO_DATE <> REPLACE(P_CCO_DATE,'-','') THEN  
+                
+                --입실객실료 삭제
+                DELETE FROM RBA05D
+                WHERE CORP_CODE = P_CORP_CODE
+                AND RESERV_NO = P_RESERV_NO
+                AND RESERV_SEQ = P_RESERV_SEQ
+                ;  
+     
+                --입실객실료 재등록
+                INSERT INTO RBA05D 
+                (CORP_CODE, RESERV_NO, RESERV_SEQ, STAYIN_DATE, ROOM_TYPE, SEASON_CODE, DAY_TYPE_CODE, RATE_CODE, ROOM_AMT, INS_EMP_NO, INS_DATE, INS_IP)
+                SELECT P_CORP_CODE, P_RESERV_NO, P_RESERV_SEQ, SALE_DATE, P_ROOM_TYPE, '000', '000', 'A002', ROUND(DBMS_RANDOM.VALUE(1,1000000)), P_UPD_EMP_NO, SYSDATE, P_UPD_IP
+                FROM BSH01M
+                WHERE CORP_CODE = P_CORP_CODE
+                AND CALENDAR_CODE = '200'
+                AND SALE_DATE BETWEEN REPLACE(P_CCI_DATE,'-','') AND REPLACE(P_CCO_DATE,'-','')-1
+                ; 
+                
+                --입실객실료 합산
+                SELECT SUM(ROOM_AMT) INTO V_ROOM_AMT
+                FROM RBA05D
+                WHERE CORP_CODE = '01'
+                AND RESERV_NO = P_RESERV_NO
+                AND RESERV_SEQ = P_RESERV_SEQ
+                GROUP BY RESERV_NO, RESERV_SEQ
+                ;
+                
+                --입실정보 수정
+                UPDATE RBA01M 
+                SET  
+                    GSC_NAME = P_GSC_NAME,
+                    GSC_TEL_NO = P_GSC_TEL_NO,
+                    ROOM_TYPE = P_ROOM_TYPE,
+                    ROOM_NO = P_ROOM_NO,
+                    CCI_DATE = REPLACE(P_CCI_DATE,'-',''),
+                    STAYIN_DAY_CNT = P_STAYIN_DAY_CNT,
+                    CCO_DATE = REPLACE(P_CCO_DATE,'-',''),
+                    ACTUAL_RATE = V_ROOM_AMT,
+                    UPD_EMP_NO = P_UPD_EMP_NO,
+                    UPD_DATE = SYSDATE,
+                    UPD_IP = P_UPD_IP
+                WHERE CORP_CODE = P_CORP_CODE
+                AND UPJANG_CODE = P_UPJANG_CODE
+                AND RESERV_NO = P_RESERV_NO
+                AND RESERV_SEQ = P_RESERV_SEQ
+                ;
+                
+            ELSE 
+            
+                UPDATE RBA01M
+                SET    
+                       GSC_NAME = P_GSC_NAME,
+                       GSC_TEL_NO = P_GSC_TEL_NO,
+                       ROOM_TYPE = P_ROOM_TYPE,
+                       ROOM_NO = P_ROOM_NO,
+                       UPD_EMP_NO = P_UPD_EMP_NO,
+                       UPD_DATE = SYSDATE,
+                       UPD_IP = P_UPD_IP
+                WHERE CORP_CODE = P_CORP_CODE
+                AND UPJANG_CODE = P_UPJANG_CODE
+                AND RESERV_NO = P_RESERV_NO
+                AND RESERV_SEQ = P_RESERV_SEQ
+                ;
+                
+            END IF;
+                     
+            O_RESULT := '1';
+                
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+                BEGIN
+                    O_MSG := SQLERRM;
+                    DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                    RETURN;
+                END;
+           
+        END; 
+        
+        
+        -- 7단계 체크아웃
+        PROCEDURE SP_CHECKOUT7(
+                                P_CORP_CODE       VARCHAR2 
+                                ,P_UPJANG_CODE     VARCHAR2
+                                ,P_RESERV_NO       VARCHAR2
+                                ,P_RESERV_SEQ      VARCHAR2
+                                ,P_UPD_EMP_NO      VARCHAR2
+                                ,P_UPD_IP          VARCHAR2
+                                ,O_RESULT       IN OUT VARCHAR2     -- 목록,상세조회 정보 
+                                ,O_MSG          IN OUT VARCHAR2     -- 오류MSG
+                            )
+        IS
+                        
+        BEGIN
+    
+            O_RESULT := '0';
+            
+            UPDATE RBA01M
+            SET    
+                   CCO_STATUS  = 'Y',
+                   CHECKOUT_YMD = TO_CHAR(SYSDATE,'YYYYMMDD'),
+                   UPD_EMP_NO = P_UPD_EMP_NO,
+                   UPD_DATE = SYSDATE,
+                   UPD_IP = P_UPD_IP
+            WHERE CORP_CODE = P_CORP_CODE
+            AND UPJANG_CODE = P_UPJANG_CODE
+            AND RESERV_NO = P_RESERV_NO
+            AND RESERV_SEQ = P_RESERV_SEQ
+            ;
+                     
+            O_RESULT := '1';
+                
+        EXCEPTION                               
+        WHEN OTHERS THEN   
+                BEGIN
+                    O_MSG := SQLERRM;
+                    DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                    RETURN;
+                END;
+           
+        END;       
+        
+        PROCEDURE SP_SELECTPOP_ALL7(
+                                    P_CORP_CODE VARCHAR2
+                                    ,P_CONDO_TYPE VARCHAR2  -- 업장코드
+                                    ,P_ROOM_TYPE VARCHAR2
+                                    ,P_ROOM_NO VARCHAR2
+                                    ,O_RESULTLIST                  OUT SYS_REFCURSOR     -- 목록,상세조회 정보 
+                                   )
+            IS
+                
+            BEGIN
+            
+                OPEN O_RESULTLIST FOR
+                               
+                SELECT CORP_CODE, UPJANG_CODE, ROOM_TYPE, ROOM_NO, GET_UPJANG_NAME(CORP_CODE,UPJANG_CODE) UPJANG_NAME
+                FROM RBD02D
+                WHERE 1=1
+                AND CORP_CODE = P_CORP_CODE
+                AND UPJANG_CODE = P_CONDO_TYPE
+                AND (P_ROOM_TYPE IS NULL OR ROOM_TYPE = P_ROOM_TYPE)
+                AND (P_ROOM_NO IS NULL OR ROOM_NO LIKE '%'||P_ROOM_NO||'%')
+                AND DUMMY_ROOM_YN = 'N';  -- 더미룸 구분
+                    
+                
+            EXCEPTION                               
+            WHEN OTHERS THEN   
+                BEGIN
+                    RETURN;
+                END;
+           
+            END;
+        
+        
+END PKG_OJTKJB;
+/

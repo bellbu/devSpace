@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="KjbSix">
+	<resultMap id="KjbSixMap" type="hashMap"></resultMap>
+	
+	<select id="Select_SchoolList" statementType="CALLABLE" resultType="hashmap">
+        {call PKG_OJTKJB.SELECT_SCHOOLLIST(
+	        #{loginVO.corpCode}
+	        ,#{sSchoolCode}
+	        ,#{O_LIST,jdbcType=CURSOR,mode=OUT, javaType=ResultSet, resultMap=KjbSixMap}
+        )}
+	</select>
+	
+	<select id="Select_UserList" statementType="CALLABLE" resultType="hashmap">
+       {call PKG_OJTKJB.SELECT_USERLIST(
+        #{loginVO.corpCode}
+        ,#{sUserId}
+        ,#{schoolCode}
+        ,#{O_LIST,jdbcType=CURSOR,mode=OUT, javaType=ResultSet, resultMap=KjbSixMap}
+       )}
+	</select>
+	
+	<select id="Select_ScoreList" statementType="CALLABLE" resultType="hashmap">
+       {call PKG_OJTKJB.SELECT_SCORELIST(
+        #{loginVO.corpCode}
+        ,#{schoolCode}
+        ,#{userId}
+        ,#{O_LIST,jdbcType=CURSOR,mode=OUT, javaType=ResultSet, resultMap=KjbSixMap}
+       )}
+	</select>
+
+</mapper>

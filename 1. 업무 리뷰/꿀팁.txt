@@ -1,0 +1,56 @@
+* 업무 순서
+1) JSP
+    - jsp, controller 연결상태에서 만들기(SQL.xml 미리 만들면 오류남)  * 이름 생성 - jsp, xml : 대문자 // java : 소문자
+
+2) Controller
+    - import 복사 붙여넣기(ctrl+shift+o 자동완성), 
+    - @Controller, @Autowired 생성, 
+    - extends LogUtil 생성, 
+    - 로거 생성 
+
+3) Service
+    - import 복사 붙여넣기(ctrl+shift+o 자동완성), 
+    - @Service, @Transactional(예외 발생시 롤백), @Autowired 생성,
+    - 로거 생성
+
+4) mapper
+    - @Component 생성,
+    - @Autowired 
+      private uSqlSession 폴더명;
+   
+* 핀크스 문자 정렬
+길이가 일정하지 않은 데이터는 왼쪽정렬(EX 이름, 메모 등)
+길이가 일정하거나 코드성 데이터는 가운데 정렬(EX 날짜, 영업장, 예약번호)
+그외 숫자는 오른쪽 정렬(순번 ,숙박일수, 가격 등) 
+
+
+* 토드 디버깅하는법
+패키지검색-에디터-바디목록에서 우클릭-컴파일-첫번째 탭 클릭 => 오케이 누르면 진행!!
+
+* YH 꿀팁
+1. 회원관리 화면 분석, 주석 달기
+2. common.js , view.js, tgrid.js 메모장에 복붙 후 어떤 식으로 동작하는지 무슨 기능인지 분석(주석 달기)
+※ 쿼리짜고 넘겨줄 파라미터 생각
+쿼리 좋은 예제 : http://localhost:9990/crm/SaveMemberForm.do
+
+
+※ 오류 시 체크리스트.
+1. exception 문구를 확인 한다.
+2. 의심 가는 항목을 체크한다.
+	ㄴ 1. 변수 명 체크.
+	ㄴ 2. 파라미터 및 파라미터 명 체크.
+	ㄴ 3. 더미 코드 or 코드 or 코드 순서 체크. (ex>  " , " , " ; " , " ),( "  )
+	ㄴ 4. null값 체크
+	ㄴ 5. 오타, 대소문자 체크.
+	ㄴ 6. 패키지 디버깅 체크.
+	ㄴ 7. SQL 체크.
+	ㄴ 8. request 확인
+3. 30분 이상 해결 안될 시 주변에 "살려주세요" 라고 외친다.
+
+
+※ 톰캣 Several ports (8005, 8080, 8009) 에러 
+1. netstat -p tcp -ano : 포트해당하는 pid 번호 확인
+2. taskkill /f /pid 번호입력 
+
+
+-Dcatalina.base="C:\userveSpace\.metadata\.plugins\org.eclipse.wst.server.core\tmp0" -Dcatalina.home="C:\Program Files (x86)\Apache Software Foundation\Tomcat 7.0" -Dwtp.deploy="C:\userveSpace\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps" -Djava.endorsed.dirs="C:\Program Files (x86)\Apache Software Foundation\Tomcat 7.0\endorsed"

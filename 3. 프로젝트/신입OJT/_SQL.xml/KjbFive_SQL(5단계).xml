@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="KjbFive">
+	<resultMap id="KjbFiveMap" type="hashMap"></resultMap>
+	
+	<select id="Select" statementType="CALLABLE" resultType="hashmap">
+		<![CDATA[
+	        {call PKG_OJTKJB.SP_SELECT5(
+		        #{loginVO.corpCode}
+		        ,#{sSchoolCode}
+		        ,#{sUserId}
+		        ,#{O_LIST,jdbcType=CURSOR,mode=OUT, javaType=ResultSet, resultMap=KjbFiveMap}
+	        )}
+		]]>
+	</select>
+	
+	<insert id="Insert" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_INSERT5 (
+			#{loginVO.corpCode},
+			#{schoolCode},
+			#{userId},
+			#{userPw},
+			#{userHp},
+			#{userAddr1},
+			#{userAddr2},
+		    #{userSex},
+		    #{userBirth},
+			#{loginVO.empNo},
+			#{loginVO.empIp},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</insert>
+	
+	<update id="Update" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_UPDATE5 (
+			#{loginVO.corpCode},
+			#{orgSchoolCode},
+			#{schoolCode},
+			#{userId},
+			#{userPw},
+			#{userHp},
+			#{userAddr1},
+			#{userAddr2},
+			#{userSex},
+			#{userBirth},
+			#{loginVO.empNo},
+			#{loginVO.empIp},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</update>
+	
+	 	
+</mapper>

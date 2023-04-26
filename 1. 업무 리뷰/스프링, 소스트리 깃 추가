@@ -1,0 +1,13 @@
+1. 스프링
+
+bilt 회사 깃 홈페이지(http://121.134.10.13:19100/repositories/) => 로그인(아이디: jbkim, 비번: 12345) => 첫번째(http://) url 복사 
+
+=> 스프링 git 버튼 => 초록색 Clone a git Repository 로그인 된 상태 => develop, master 체크 => develop 선택 => finish
+
+힝목 내려서 Working Tree 우클릭 Import Projects => maven 적힌거 체크 => finish => 자바로 돌아가기 => .yml dev O(real X) : 13행 =>해당 프로젝트 run as 
+
+* 로컬에 브랜치 가져오는 법
+스프링 git 모드 => 브랜치 항목 열기 => Local 폴더 우클릭 => Switch To => New Branch => Select 선택 확인 => finish
+
+2. 소스트리
+ - New Tab => Add 추가 => 프로젝트 저장 된 경로 복사 => 작업경로 탐색 => 추가

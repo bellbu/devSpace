@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="KjbOneGrid">
+	<resultMap id="KjbOneGridMap" type="hashMap"></resultMap>
+	
+	<select id="Select" statementType="CALLABLE" resultType="hashmap">
+		<![CDATA[
+	        {call PKG_OJTKJB.SP_SELECT1(
+		        #{loginVO.corpCode}
+		        ,#{sUserId}
+		        ,#{sStDate}
+		        ,#{sEdDate}
+		        ,#{sSexName}
+		        ,#{O_LIST,jdbcType=CURSOR,mode=OUT, javaType=ResultSet, resultMap=KjbOneGridMap}
+	        )}
+		]]>
+	</select>
+	
+	 	
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="KjbOneGridBind">
+	<resultMap id="KjbOneGridBindMap" type="hashMap"></resultMap>
+	
+	<insert id="Insert" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_INSERT2 (
+			#{loginVO.corpCode},
+			#{userId},
+			#{userPw},
+			#{userAddr1},
+			#{userAddr2},
+		    #{userHp},
+		    #{userSexName},
+		    #{userBirth},
+			#{loginVO.empNo},
+			#{loginVO.empIp},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</insert>
+	
+	<update id="Update" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_UPDATE2 (
+			#{loginVO.corpCode},
+			#{userId},
+			#{userPw},
+			#{userAddr1},
+			#{userAddr2},
+			#{userHp},
+			#{userSexName},
+			#{userBirth},
+			#{loginVO.empNo},
+			#{loginVO.empIp},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</update>
+	
+	<delete id="Delete" statementType="CALLABLE">
+		{call PKG_OJTKJB.SP_DELETE2 (
+			#{loginVO.corpCode},
+			#{userId},
+			#{O_RESULT,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT},
+			#{O_MSG,javaType=java.lang.String,jdbcType=VARCHAR,mode=INOUT}
+		)}
+	</delete>
+	
+	
+</mapper>

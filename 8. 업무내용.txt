@@ -1,0 +1,1133 @@
+* 고객 요청 사항 - 현재 작업 진행사항
+ 1. [고객 SMS 관리]
+  완료 - SMS 수신여부 표시
+  완료 - 받는 사람 선택 시 몇 명인지 표시
+  완료 - 발신번호 input으로 변경
+
+ 2. [예약발송현황]
+  완료 - 수신자 및 수신번호 검색
+  완료 - 발신번호 input으로 변경
+  완료 - 발송부서 로그인한 사람의 부서를 선택(비활성화 처리) : 공통코드 CO018
+
+ 3. [직원발송SMS],  [SMS/알림톡관리]
+  완료- 예약 전송 기능 추가(예약발송현황에서 관리)
+  - 받는 사람 선택 시 몇 명인지 표시
+  - 검색 초기화 작업
+  - 운영에서 검색 리스트
+
+ 4. [예약자공지사항전송]
+  - 예약전송 기능
+  - 받는 사람 선택 시 몇 명인지 표시
+  - 검색 초기화 작업
+
+===========================================================
+
+0) [고객 SMS 관리] - 완료
+작업완료 - return false 추가
+
+1) [예약자공지사항전송] - 완료
+작업완료 - 예약 전송 기능 추가
+
+2) [직원발송SMS], [예약자공지사항전송], [SMS/알림톡관리]
+작업완료 - 검색 초기화 작업
+작업완료- 받는 사람 선택 시 몇 명인지 표시
+
+3) [직원발송SMS],
+작업완료 - 운영에서 검색리스트
+
+4) 메일점검
+
+5) 테스트
+
+* 주의사항
+2. [고객 SMS 관리] 
+- jsp : 테스트 위해 && rowData.smsSendYn == "Y" 주석처리
+- DB : 테스트 위해 수신번호 등록여부, 수신여부 유효성 체크 주석처리 
+
+3. [예약자공지사항전송]
+- jsp : 쿼리 복잡하여 SMS수신여부 셀렉트 못해 수신여부 유효성 검사 처리 못했음
+
+4. [직원발송SMS]
+- jsp : 수정 전 부터 직원 수정 시 오류 발생함 => update 추가함
+
+===========================================================
+
+* 수정,추가 내용
+1. [공통]
+- 초기화, 유효성 검사 추가
+- 체크박스 형태 변경, 선택인원 표시 추가
+- 발신번호 select박스 => input로 변경  ※ 등록되지 않은 발신번호는 .commonSendMms 메서드 유효성 검사로 인해 전송 안됨. 
+- 예약전송 정보 저장 PKG_SMSAndTalkMngt.SP_RSV_INSERT 통일
+
+2. [고객SMS관리]
+- 주석처리(472줄) - 현 테이블에 SMS수신여부 존재하지 않아 주석처리함
+
+3. [예약자공지사항전송], [직원발송SMS], [SMS/알림톡관리]
+- 예약전송 기능 추가 
+
+4. [예약발송현황]
+- JSP
+1) 수신자, 수신번호 검색조건 추가 
+2) 로그인 정보[발송부서(공통코드:CO018), 사번] 상단 추가
+
+- DB 
+1) PKG_AlimtalkTemplateReserveMgnt.SP_SELECT : 검색조건 파라미터 추가 (P_GUEST_NAME, P_HP_NO) 
+2) PKG_AlimtalkTemplateReserveMgnt.SP_USER_SELECT : 검색조건 파라미터 추가 (P_GUEST_NAME, P_HP_NO)
+3) PKG_AlimtalkTemplateReserveMgnt.SP_USER_UPDATE : 발신번호 수정을 위해 파라미터 추가 (P_CALL_HP_NO)
+
+=====================================================================
+
+고객SMS관리, 예약자공지사항전송, 직원발송SMS, SMS/알림톡관리
+
+0647937010 고객sms
+0647936031 예약자공지사항
+0647935041 직원발송sms
+0647935049 SMS/알림톡관리
+
+
+1. sendInfut
+[{"chk":"Y","guestNo":null,"memName":"황진욱","guestTypeName":null,"sexName":null,"hpNo":"01040399454","smsSendYn":null,"remarks":null,"rnum":1,"sex":null,"totalCount":4,"corpCode":"01","rowKey":0,"sortKey":0,"uniqueKey":"@dataKey1673334099502-0","_attributes":{"rowNum":1,"checked":false,"disabled":false,"checkDisabled":false,"className":{"row":["tui-selected-row"],"column":{"hpNo":["secretCell"]}}},"_disabledPriority":{},"rowSpanMap":{},"_relationListItemMap":{}},
+{"chk":"Y","guestNo":null,"memName":"박준서","guestTypeName":null,"sexName":null,"hpNo":"01062327744","smsSendYn":null,"remarks":null,"rnum":2,"sex":null,"totalCount":4,"corpCode":"01","rowKey":1,"sortKey":1,"uniqueKey":"@dataKey1673334099502-1","_attributes":{"rowNum":2,"checked":false,"disabled":false,"checkDisabled":false,"className":{"row":[],"column":{"hpNo":["secretCell"]}}},"_disabledPriority":{},"rowSpanMap":{},"_relationListItemMap":{}},
+{"chk":"Y","guestNo":null,"memName":"정연호","guestTypeName":null,"sexName":null,"hpNo":"01066490626","smsSendYn":null,"remarks":null,"rnum":3,"sex":null,"totalCount":4,"corpCode":"01","rowKey":2,"sortKey":2,"uniqueKey":"@dataKey1673334099502-2","_attributes":{"rowNum":3,"checked":false,"disabled":false,"checkDisabled":false,"className":{"row":[],"column":{"hpNo":["secretCell"]}}},"_disabledPriority":{},"rowSpanMap":{},"_relationListItemMap":{}},
+{"chk":"Y","guestNo":null,"memName":"김종부","guestTypeName":null,"sexName":null,"hpNo":"01066613076","smsSendYn":null,"remarks":null,"rnum":4,"sex":null,"totalCount":4,"corpCode":"01","rowKey":3,"sortKey":3,"uniqueKey":"@dataKey1673334099502-3","_attributes":{"rowNum":4,"checked":false,"disabled":false,"checkDisabled":false,"className":{"row":[],"column":{"hpNo":["secretCell"]}}},"_disabledPriority":{},"rowSpanMap":{},"_relationListItemMap":{}}]
+
+2. memberGrid
+[{"chk":"Y","guestNo":null,"memName":"황진욱","guestTypeName":null,"sexName":null,"hpNo":"01040399454","smsSendYn":null,"remarks":null,"rnum":1,"sex":null,"totalCount":4,"corpCode":"01","rowKey":0,"sortKey":0,"uniqueKey":"@dataKey1673334099502-0","_attributes":{"rowNum":1,"checked":false,"disabled":false,"checkDisabled":false,"className":{"row":["tui-selected-row"],"column":{"hpNo":["secretCell"]}}},"_disabledPriority":{},"rowSpanMap":{},"_relationListItemMap":{}},
+{"chk":"Y","guestNo":null,"memName":"박준서","guestTypeName":null,"sexName":null,"hpNo":"01062327744","smsSendYn":null,"remarks":null,"rnum":2,"sex":null,"totalCount":4,"corpCode":"01","rowKey":1,"sortKey":1,"uniqueKey":"@dataKey1673334099502-1","_attributes":{"rowNum":2,"checked":false,"disabled":false,"checkDisabled":false,"className":{"row":[],"column":{"hpNo":["secretCell"]}}},"_disabledPriority":{},"rowSpanMap":{},"_relationListItemMap":{}},
+{"chk":"Y","guestNo":null,"memName":"정연호","guestTypeName":null,"sexName":null,"hpNo":"01066490626","smsSendYn":null,"remarks":null,"rnum":3,"sex":null,"totalCount":4,"corpCode":"01","rowKey":2,"sortKey":2,"uniqueKey":"@dataKey1673334099502-2","_attributes":{"rowNum":3,"checked":false,"disabled":false,"checkDisabled":false,"className":{"row":[],"column":{"hpNo":["secretCell"]}}},"_disabledPriority":{},"rowSpanMap":{},"_relationListItemMap":{}},
+{"chk":"Y","guestNo":null,"memName":"김종부","guestTypeName":null,"sexName":null,"hpNo":"01066613076","smsSendYn":null,"remarks":null,"rnum":4,"sex":null,"totalCount":4,"corpCode":"01","rowKey":3,"sortKey":3,"uniqueKey":"@dataKey1673334099502-3","_attributes":{"rowNum":4,"checked":false,"disabled":false,"checkDisabled":false,"className":{"row":[],"column":{"hpNo":["secretCell"]}}},"_disabledPriority":{},"rowSpanMap":{},"_relationListItemMap":{}}]
+
+====================================================================================
+
+#2023 - 01 - 31(화) 
+
+완료 - 법인예약조회 -> 화면따서 일반예약 조회 만들기
+
+
+완료 - 검색조건 멤버사 -> 회원구분
+
+완료 - 그리드 회사명 -> 회원구분
+완료 - 그리드 위에 문구 법인예약 조회 -> 일반예약 조회
+
+그리드 순서
+- 예약번호(기존) 예약자(기존) 고객구분(신규) 고객유형(신규):guestType(CRA01M), 공통코드(CR003)
+
+검색조건 
+- 예약번호(기존) 예약자명(기존):memName 회원번호(신규):memNo(CRA01M) 고객구분(신규):memType(CRA01M)
+
+
+
+memNo(회원번호), memType(고객구분), guestType(고객유형) - CR003
+
+
+쿼리는 법인예약 조회에서 조건 변경 생각해서 해보세용
+안되면 제가 제공해드릴게요
+
+
+CReservListForm
+
+
+GeneralReservListForm
+
+/rsv/GeneralReservListForm.do
+=========================================
+
+구분을 아카데미로 바꾸면 예약자 INPUT에 "아카데미"텍스트 고정으로 바로 저장버튼누르면 저장되게
+
+====================================================================================
+
+#2023 - 02 - 01(수)
+
+법인예약조회 => 화면 따서 일반예약조회 만들어보기
+ptc예약 
+
+
+P_CORP_CODE                    VARCHAR2
+                             ,P_ST_DATE                     VARCHAR2
+                             ,P_ED_DATE                     VARCHAR2
+                             ,P_MEM_TYPE                    VARCHAR2
+                             ,P_RESERV_NO                   VARCHAR2
+                             ,P_BOOK_NAME                   VARCHAR2
+                             ,P_MEM_NO                      VARCHAR2
+                             ,O_RESULTLIST                  OUT SYS_REFCURSOR  
+
+====================================================================================
+
+#2023 - 02 - 02(목)
+PTC테니스코트 예약
+
+* DB 수정내용
+PKG_PtcMembershipScheduleMngm.SP_TIMELIST_SELECT 프로시저 "쿼리수정" : P_GUEST_NAME, P_RESERV_GUBUN 파라미터 추가
+
+* sms문자 테스트 위해서 주석처리 부분 
+skPinxPmsBathConfig.java에서 Batch_ReservSMS_Select 파트
+502줄 주석처리        /*			if(ip.equals("192.168.1.107") && pmsTomcatCheck) {*/
+521줄 주석처리				/* } *
+
+GUEST_NO 고객번호(한 사람 하나) - CRA01M
+MEM_NO 회원번호(한 사람 여러개) - CRA02M
+MEM_TYPE 고객구분(CR034 : 일반골프회원, 골드회원, 법인PKG, 비오토피아) - CRA01M, CRA02M
+GUEST_TYPE 고객유형(CR003 : 본인, 가족/지정인, 기타) - CRA01M, CRA02M
+OFFICE_NAME 직장명 - CRA01M
+IDX 순번 - CRA02M
+RELATION 관계구분(고객유형보다 디테일)(CR008 : 본인, 가족, 지정인, 동료, 배우자, 지정인(배우자), 골프지정인, 지정인) - CRA02M
+
+1. 회원정보 탭
+
+질문)
+고객유형, 관계 차이???
+
+
+====================================================================================
+
+#2023 - 02 - 06(월)
+레시피 관리
+
+모든 이미지
+원칙적으로 2MB이하 사진만 등록 가능
+2메가 이미지 오류 발생
+
+19개이하만 등록 가능
+
+일반예약조회
+고객구분예약번호 앞으로
+고객구분 예약자 앞에 온천그리드 줄이기
+팝업 회원명, 회원번호 추가(가족/지정인관리 페이지 참고)
+
+====================================================================================
+
+#2023 - 02 - 08(수)
+
+1. 정비객실등록(9일까지 개발완료/10일 테스트)
+완료 - 1) 일괄저장 ex)박준서 101, 102 한번에 저장
+  - 서비스단 로직 생각
+  - DB 쿼리 및 파라미터 확인  
+
+완료 - 2) 객실정보 그리드 투숙객명 옆에 칼럼 추가 
+  - 테블릿 객실 담당사원 SELECT 참고
+
+ 3) 메이드검색 팝업 객실 구분 추가(객실구분은 정비원등록(메이드) 참고)
+
+ 4) 알림말 추가
+ 신규등록, 수정 사항
+
+* 복구 내용
+그리드에서 roomNo, makeYn, type 히든처리
+그리드에서 roomNo, makeYn, type  width 주석처리
+그리드에서 remarks의 width:400 처리
+
+* 예외처리
+완료 - 체크 없이 저장 유효성 처리
+완료 - 체크 객실번호랑 오른쪽 객실번호가 다른경우 저장X
+
+* 수정내용
+PKG_RoomMakeupStatMngm.SP_SELECT_ROOM 프로시저 수정 : 쿼리 수정
+PKG_MaidListPop.SP_SELECT 프로시저 수정 : 파라미터 추가, 조건절 쿼리 
+
+
+다중선택 시 신규는 선택된 객실 모두 등록되고 수정은 해당 객실만 됩니다.
+
+================================================================
+
+업무 양식
+1. 업무제목
+1) 업무내용
+- 세부내용
+2) 업무내용
+- 세부내용
+
+* 복구내용
+* 예외처리
+* 수정내용
+
+====================================================================================
+
+#2023 - 02 - 15(수)
+
+1. 업무제목
+- 레시피 관리
+1) 업무내용
+AND RCP_MNGM_YN = 'Y / AND USE_YN = 'Y' 인 경우 업데이트
+수량 갯수 확인
+
+
+자재관리 품목 수정/추가한 경우 해당 메뉴코드에 인서트/업데이트 
+그리고 해당 메뉴코드를 가진 레시피 업데이트
+
+
+
+* 복구내용
+첫째 그리드 rcpDetailYn, 둘째 그리드 menuCode 히든 처리
+
+* 예외처리
+
+* 수정내용
+PKG_RetrieveRecipeMngmForm.SP_INSERT 내용 추가
+PKG_RetrieveRecipeMngmForm.SP_SELECT_RECIP_PRICE 수정
+
+
+=================================================================================
+
+골프예약추천인관리 
+
+1. 한도차감 Y,N 수정가능하게 변경(추천인 변경 참고)
+2. 변경하면 RSA50S 비고내역에 추천인 변경 : " -> ", 한도차감 변경 : " -> " 나타냄
+
+개인별예약변경 
+1. 변경이력 나타냄
+
+
+수정 시 개인별예약변경
+
+
+추천자 변경(현재 가능)
+
+한도차감 'y' 'n'변경 할 수 있도록
+
+  --> 변경하면 비고에 내역 rsa50s 비고에
+[추천인 변경 : '' -> '']
+[한도차감 변경 : '' -> ''/]
+
+----------------------------------------------------
+
+골프예약추천인관리
+
+	골프예약추천인관리 -> 추천인 OR 한도차감 변경 시
+	RSA50H	->	INSERT
+		HISTORY_MODE = 'UPDATE'
+		들어갈 정보들 RSA50S에 다 있음.(RESERV_NO, RESERV_SEQ.........)
+
+====================================================================================
+
+#2023 - 02 - 16(목)
+
+- 정비객실 등록
+업무코드: WD2023-305
+
+업무내용: 정비원 삭제 기능 추가(시작일 없는거)
+
+* DB 수정내용
+PKG_RoomMakeupStatMngm.SP_DELETE 프로시저 추가
+
+
+====================================================================================
+
+#2023 - 02 - 20(월)
+
+1. 핀크스 레시피 관리 (WD2023-320) / 저용량 업데이트(WD2023-332) / 고정락카(WD2023-363)
+* 수정내용 (-- 2023-02-20으로 주석처리)
+PKG_RetrieveRecipeMngmForm.SP_INSERT 수정 (POA02S 테이블에 품목이 없는 경우 있어 이너조인으로 변경, 쿼리 속도 향상을 위해 조건에 맞는 경우에만 업데이트 하도록 변경)
+PKG_RetrieveRecipeMngmForm.SP_SELECT_RECIP_PRICE 수정 (POA02S 이너조인으로 변경하여 품목추가 시 단가 통일성 있게 처리)
+
+2. 핀크스 테블릿 (WD2023-126)
+작업완료 - 1) 시설정비요청/분실물등록 접수 후 뒤로가기로 통일
+
+작업보류 - 1.5) 청소시작,인스펙터 확인, 청소완료 후 작업중인 화면 이동
+
+작업완료 - 2) 메인화면 그리드 객실번호 옆에 객실타입(RB003) 추가
+    - 객실 정보는 pms 객실정보등록에 등록 참고
+
+작업완료 - 3) 검색조건 필터 추가
+
+작업완료 - 4) 고장객실 표기(빨강 배경색 OR 빨강 폰트)
+  - PMS 고장객실 등록 => 인디케이터 조회 고장 표시됨 : PMS RBD03H 레프트 조인 참고  
+
+객실타입 : 고장 표시
+상태 : 점검요청 표시
+
+
+  5) 메인화면 시설정비조회 버튼 및 기능 추가 (http://localhost:9999/tablet/bio 참고)
+    - 메이드 로그인 시 hide
+    - 관리자&인스펙터 로그인 시 show	
+    - 참고한 비오 시설정비조회 화면 비율 다르므로 주의
+
+* 복구 내용
+히든삭제 복구 id="cleanType"
+
+* 수정 내용
+1. USERVE.PKG_ROOMFIXLIST.SP_SELECT 프로시저 수정 
+ - 고장객실 셀렉트 위해서 RBD03H 테이블 LEFT 조인하여 컬럼 CASE WHEN H.BDW_STAT = '002' THEN '고장' ROOM_STAT_NAME 부분 수정 
+
+2. PKG_Roominfo.SP_MERGE2 프로시저 생성
+ - 청소시작 후 작업페이지 GET 방식 URL 생성을 위해 O_ST_TIME, O_MTC_NO 파라미터 추가  
+
+* 계정					
+포도호텔 메이드 아이디 : 000050(장민숙) 비번: 1q2w3e^^
+포도호텔 인스펙터 아이디 : 000051(김은희) 비번: 1q2w3e^^
+비오토피아 메이드 아이디: 000040(한경배) 비번: 1q2w3e^^
+비오토피아 인스펙터 아이디: 000041(벨라) 비번: 1q2w3e^^
+디아넥스 메이드 아이디: 000080(한성철) 비번: 1q2w3e^^
+디아넥스 인스펙터 아이디: 000081(이준호) 비번: 1q2w3e^^
+
+
+====================================================================================
+
+#2023 - 02 - 21(화)
+
+핀크스 레시피 관리
+
+현재 REAL_UNIT대로 가격 업데이트
+
+수정 품목추가시 UNIT 가격 
+
+
+http://localhost:9999/tablet/RoomInfo.do?upjangCode=2201&roomNo=2012&mtcNo=3&cleanStatNo=02&stTime=14:55
+http://localhost:9999/tablet/RoomInfo.do?upjangCode=2201&roomNo=2012&mtcNo=2&cleanStatNo=03&stTime=14:55
+
+
+====================================================================================
+
+#2023 - 02 - 22(수)
+
+시설정비 현황
+
+1. 메인화면 시설정비조회 버튼 및 기능 추가 (http://localhost:9999/tablet/bio 참고)
+  - 메이드 로그인 시 hide
+  - 관리자&인스펙터 로그인 시 show	
+  - 참고한 비오 시설정비조회 화면 비율 다르므로 주의
+
+* 복구 내용
+
+
+* 수정 내용
+
+
+window.location.href = '/tablet/BioTable.do';
+
+
+
+===========================================================================    
+  2023-02-23 (목)
+
+골프예약추천인관리, 개인별예약변경(변경이력 나타나게)
+
+완료 - 1. 고객구분 선택 검색조회X
+완료 - 2. 고객명단에 고객구분 컬럼 표시
+완료 - 3. 일반고객 포함 예약건 조회 (cra01m 조인)
+완료 - 4. 추천자 변경 시 변경사유 입력 받아 처리(저장 누를 시 사유 입력받게 PROMPT 사용) 
+  
+  개인별예약변경 페이지에서 변경이력 나타나게함
+
+  5. [골프예역추천인관리] => [골프예약추천인변경관리] 명칭 변경 후 동일프로그램 복사하여 [골프예역추천인관리] 추가로 메뉴 생성 
+    
+
+
+* 가이드
+ cra01m ->  고객정보(가입X)
+
+ cra02m -> 회원권 정보
+
+법인pkg => 회원권X
+
+
+
+3.
+골프예약은 8주 뒤꺼를 받음.
+2022년도 법인pkg 회원권이 있던 고객이 2022년 11~12월에 2023년 1~2월 예약 가능.
+근데 이 사람이 22년도에 23년도 갱신이 될지 안될지 100프로 확신 못 함.
+23년도 1월에 갑자기 전출? 퇴직 기타 사유로 갱신 안됨
+그러면 한도(포인트) 차감을 했던 건을 다른 법인pkg회원권으로 돌려서 차감해야 함.
+
+4.
+동 -> 서코스 원하심. / 입력문자 / 
+UPDATE시
+동->서코스 원하심. / 추천인 변경 : ' ' -> '나동주3' / 변경 사유 : 테스트 중
+동->서코스 원하심. / 추천인 변경 : ' ' -> '나동주3' / 변경사유:xxxx  / 추천인 삭제 / 삭제 사유: xxxxx / 
+
+* 골프예약추천인관리 테이블
+RSA50S : 골프예약(PK:예약번호,예약타임순번) -- 내장자, 추천자
+RSA51S : 통합예약(PK:예약번호)  -- 예약자, 신청자, 
+CRA01M : 고객정보(PK:고객번호) - 회원권X
+
+CRA02M : 회원추가정보(PK:회원번호, IDX) - 회원권O
+CRA04M : 회원 혜택 마스터(PK:회원번호)
+CRA05M : 회원 포인트(PX:회원번호, 년도)
+
+* 개인별예약변경 테이블
+RSC01M : 객실 예약(PK:예약번호, 예약순번) 
+RSC01H : 객실 예약 히스토리(PK: 예약번호, 예약번호, 예약순번, SEQ)
+RSA50H : 골프예약 히스토리(PK: 예약번호, 예약번호, 예약순번, SEQ)
+RSA55s : 통합예약 취소 정보(예약번호, 예약순번)
+
+* RSA50S 업데이트 후 => RSA50H 인서트
+
+* 골프예약추천인관리 수정내용
+PKG_CORPPKGRSVRECOMMNGM.SP_SELECT2 프로시저 수정: 기존 프로시저 주석처리 후 전체수정
+PKG_CORPPKGRSVRECOMMNGM.SP_SELECT_RSV2 프로시저 수정 : 셀릭트 칼럼 추가 (ORG_RECOM_MEM_NO, ORG_RECOM_NAME) 
+PKG_CORPPKGRSVRECOMMNGM.SP_UPDATE2 추가
+
+
+* 개인별예약변경 수정내용
+PKG_EachReservModifyHistory.SP_MODIFY_LIST_SELECT 수정
+
+* 문의 사항
+- 한도차감 변경 시 비고란에 나타내고, SELECT 해올 때 한번 더 나타냄
+- 추천인 변경 시 로우 생성될 때 있으므로 마지막 선택된 ROWKEY 변경 될 때 있음
+
+
+
+===========================================================================    
+  2023-02-23 (목)
+
+골프예약추천인관리  골프예약추천인변경관리
+한도차감부분 변경O  한도차감부분 변경X 
+
+
+* 비고란 사이즈 조절 해야 됨
+
+* 수정내용
+1) 골프예약추천인관리
+PKG_CORPPKGRSVRECOMMNGM.SP_SELECT2 수정
+PKG_CORPPKGRSVRECOMMNGM.SP_SELECT_RSV2 수정
+PKG_CORPPKGRSVRECOMMNGM.SP_UPDATE2 추가
+
+2) 개인별예약변경 - 변경이력
+PKG_EachReservModifyHistory.SP_MODIFY_LIST_SELECT
+
+
+===========================================================================    
+  
+  2023-03-02 (목)
+
+
+border-right: 1px solid #d7d7d7 !important;
+
+
+            V_MTC_NO          VARCHAR2(6);
+               V_ORG_MTC_NO          VARCHAR2(6);
+               V_MTC_NO_CNT          VARCHAR2(6);
+               V_TIME_CHECK   VARCHAR2(10);
+
+
+
+                BEGIN
+                
+                SELECT COUNT(*) OVER(), MTC_NO INTO V_MTC_NO_CNT, V_ORG_MTC_NO
+                FROM RBD04H
+                WHERE CORP_CODE = P_CORP_CODE
+                AND ROOM_NO = P_ROOM_NO
+                AND UPJANG_CODE = P_UPJANG_CODE
+                AND MTC_NO = P_MTC_NO;
+                
+                 EXCEPTION WHEN NO_DATA_FOUND THEN
+             
+                V_MTC_NO_CNT := 0;    
+                V_ORG_MTC_NO := ' ';
+                
+                END;
+
+
+                2008호 1
+
+
+
+* 수정내용
+PKG_Roominfo.SP_MERGE2 수정
+PKG_Roominfo.SP_REMARKS_REG2 수정
+
+전체조건으로 수정
+bookname
+
+===========================================================================    
+  
+  2023-03-03 (금)
+
+* 오늘 작업 내용
+골프예약추천인관리, 골프예약추천인변경관리 
+완료 - 추천인 삭제
+- 리스트 변경
+완료 - 사유 입력 확인
+
+추천자 삭제
+- 고객번호(recomGuestNo)
+- 회원번호(recomMemNo)
+- 추천인 고객번호, 회원번호 없음 => 추천인 비어있는 경우 추천인 삭제 비고 처리됨
+- 삭제 파라미터 받아야 함
+
+==========================================================
+청소재시작
+- 재시작시 파라미터 : {upjangCode=2101, roomNo=101, roomStat=재실, stTime=16:18, mtcNo=100, type=readd, edTime=16:45, maidName=김종부, gscName=123, maidNo=, cleanStatCode=01, cleanStat=청소완료, roomType=디럭스 양실(트윈), remarks=} 
+- 비고처리
+
+테블릿 시설정비 현황
+- 자체점검 탭 제거
+- 주택조회 메인화면 따서 가져오기
+- 리스트 셀렉트 쿼리는 PMS 객실수리접수현황 참고(PKG_HouseRepairRequestReq.SP_SELECT)
+
+* 업무리스트
+완료 - 자체점검 탭 제거
+완료 - 권한에 따른 시설정비 현황 버튼(메이드 계정 접근 시 hide,관리자&인스펙터 Show), 
+완료 - 호텔 셀렉트(인스펙터 셀렉트 hide, 관리자 셀렉트 show)
+완료 - 로그인 정보 가져오기
+완료 - 객실조회 가져오기(리스트)
+완료 - 비고처리
+완료 - 셀렉트 쿼리 작성
+완료 - 리스트 길이 조절
+완료 - 확인일자
+- 전송처리
+
+* 수정내용 
+PKG_Roominfo.SP_INSERT2 2생성하여 추가 : 재시작 비고처리
+PKG_RoomRegRetrieve.SP_SELECT 추가 : 시설정비 리스트 가져오기(확인/완료 처리 및 수정은 비오그대로 가져다 씀)
+
+* 작업내용
+완료 - 운영에 프로시저 추가
+완료 - 페이지 제목  상세현황 변경, 삭제 이미지 높이 조절
+완료 - 운영서버에서 이미지 확인
+- 운영에서 접수사원 확인
+
+* 계정					
+포도호텔 메이드 아이디 : 000050(장민숙) 비번: 1q2w3e^^
+포도호텔 인스펙터 아이디 : 000051(김은희) 비번: 1q2w3e^^
+비오토피아 메이드 아이디: 000040(한경배) 비번: 1q2w3e^^
+비오토피아 인스펙터 아이디: 000041(벨라) 비번: 1q2w3e^^
+디아넥스 메이드 아이디: 000080(한성철) 비번: 1q2w3e^^
+디아넥스 인스펙터 아이디: 000081(이준호) 비번: 1q2w3e^^
+
+ (http://localhost:9999/tablet/bio 참고)
+
+
+BTM20M 주택수리요청접수(PK: ACCEPT_NO 접수번호)
+BTM21M 주택수리요청 확인처리(PK: ACCEPT_NO 접수번호)
+BTM01M 주택입주정보(PK: ROOOM_NO 객실번호(주택번호))
+CRA02M 회원추가정보(PK: MEM_NO 회원번호, IDX 순번)
+CRA01M 고객정보(PK: GUEST_NO 고객번호)
+
+
+관리구분 일반주택:00/멤버사:11
+
+접수일, 
+객실번호, 
+업장코드, 
+(멤버사, 일반주택),
+ (접수, 확인, 완료)
+
+* 주택수리진행상태
+GET_COMMCODE(B20.CORP_CODE,'BT010',B20.ACCEPT_STAT) AS ACCEPT_STAT_N,
+1. 접수, 2. 확인, 3. 완료
+
+
+
+박준서 책임님 운영 객실 접속하려고 하는데 아이디랑 비번 좀 알 수 있을까요??
+
+
+====================================================================================
+
+2023-03-10 (금)
+
+	 $("#sDate").getCal() != '20230310' || '20230311'--> 검색
+	 ALERT('금일 또는 명일 외에 조회가 불가능합니다.');
+	 RETURN;
+
+
+
+====================================================================================
+
+2023-03-13 (월)
+
+완료 - “Lost & Found” 데이터 order by 기준 
+- 직원발송sms인원 카운트
+
+					$('[data-grid-id=2] .tui-grid-cell-summary[data-column-name=empName]').text(chkTotal+'명').css({"font-size":"13px", "text-align":"left"});
+
+
+
+게실글 작성 상태 - PMS	WD2023-519	PTC멤버쉽회원 등록 	 -	가입등급 너비 조정	김종부
+                  PMS	WD2023-517	내장객특이사항조회   -	오늘/내일 조회 할 수 있도록 기간제한	김종부
+In Review 상태 - PMS	WD2023-542	Lost & Found       - 접수일자 기준으로 ORDER BY 추가	김종부
+게실글 작성 상태 - PMS	WD2023-526	직원발송SMS	        - 체크이벤트 함수 수정
+
+
+@김종부
+○ 2023-03-14(화)
+1. 발생원인
+1) 
+
+2. 조치내역
+1) 
+
+3. 개발 완료 후 검증방법(최대한 상세히 검증방법 기술 요청드립니다.)
+1)
+  
+ 4. 반영 일자
+
+1) DB반영 
+
+    없음
+
+2) 소스반영
+    2023-03-14(화) 야간 운영 반영 예정이며,
+    2023-03-15(수) 부터 운영 확인 가능하십니다.
+    운영 반영 시 확인 후 INREVIEW 요청드리도록 하겠습니다.
+    감사합니다.
+
+- DB변경 작업이라 별도의 반영 작업 필요 없어 현재 운영서버에 적용 되었습니다. 확인부탁드리겠습니다.
+
+쿼리 반영 = 즉시/ 소스 반영 = 익일 확인 하시어 적용 시점 기입 부탁 드립니다.
+
+
+* gridData
+{"Param":{"sStDate":"20230202","sEdDate":"20230314","sRoomType":"","sManagementType":"","sRelativeType":"","sOwnerGuestName":"","sRoomNo":"","sSearchName":"","state":"CheckInPerformance.Select"},
+"IdData":[{"key":"roomNo"},{"key":"ownerGuestName"},{"key":"cci"},{"key":"cco"},{"key":"stayinDayCnt"},{"key":"realCcoDate"},{"key":"realStayinDayCnt"},{"key":"jata"},{"key":"gscName"},{"key":"fellowName"},{"key":"gscTelNo"},{"key":"bookName"},{"key":"membersa"},{"key":"rRemarks"}],"Footer":{},
+"ExcelTitle":"입실실적현황",
+"NameData":[{"name":"객실번호","width":60},{"name":"소유자명","width":200},{"name":"입실일시","width":110},{"name":"퇴실일시","width":110},{"name":"숙박일수","width":80},{"name":"실퇴실일자","width":110},{"name":"실숙박일수","width":80},{"name":"이용구분","width":100},{"name":"투숙객명","width":100},{"name":"동숙자명","width":100},{"name":"연락처","width":100},{"name":"예약자명","width":100},{"name":"멤버사명","width":150},{"name":"비고","width":350}],
+"NoAlignData":[{"center":0},{"left":1},{"center":2},{"center":3},{"right":4},{"center":5},{"right":6},{"center":7},{"left":8},{"left":9},{"center":10},{"left":11},{"left":12},{"left":13}],"MergeData":[],"GroupHeaderData":[],"MergeYN":"Y"}
+
+* param
+{postData={"Param":{"sStDate":"20230202","sEdDate":"20230314","sRoomType":"","sManagementType":"","sRelativeType":"","sOwnerGuestName":"","sRoomNo":"","sSearchName":"","state":"CheckInPerformance.Select"},
+"IdData":[{"key":"roomNo"},{"key":"ownerGuestName"},{"key":"cci"},{"key":"cco"},{"key":"stayinDayCnt"},{"key":"realCcoDate"},{"key":"realStayinDayCnt"},{"key":"jata"},{"key":"gscName"},{"key":"fellowName"},{"key":"gscTelNo"},{"key":"bookName"},{"key":"membersa"},{"key":"rRemarks"}],"Footer":{},"ExcelTitle":"입실실적현황","NameData":[{"name":"객실번호","width":60},{"name":"소유자명","width":200},{"name":"입실일시","width":110},{"name":"퇴실일시","width":110},{"name":"숙박일수","width":80},{"name":"실퇴실일자","width":110},{"name":"실숙박일수","width":80},{"name":"이용구분","width":100},{"name":"투숙객명","width":100},{"name":"동숙자명","width":100},{"name":"연락처","width":100},{"name":"예약자명","width":100},{"name":"멤버사명","width":150},{"name":"비고","width":350}],"NoAlignData":[{"center":0},{"left":1},{"center":2},{"center":3},{"right":4},{"center":5},{"right":6},{"center":7},{"left":8},{"left":9},{"center":10},{"left":11},{"left":12},{"left":13}],"MergeData":[],"GroupHeaderData":[],"MergeYN":"Y"}}
+
+* QueryParam
+{sStDate=20230202, sSearchName=, sRoomNo=, sRelativeType=, sManagementType=, sRoomType=, state=CheckInPerformance.Select, sEdDate=20230314, sOwnerGuestName=}
+
+* resultData
+{O_LIST=[{gscTelNo=null, membersa=null, roomNo=C9-101, ownerGuestName=김정주, rRequestRelative=null, oldHouseNo=309101, cci=2021-06-28 :, upjang=비오토피아, fellowName=null, bookName=김정주, rRemarks=null, cco=2023-12-15 :, relativeType=null, stayinDayCnt=40, realCcoDate=null, realStayinDayCnt=null, jata=null, gscName=김정주, rRelativeType=null}, 
+{gscTelNo=null, membersa=null, roomNo=West 11, ownerGuestName=김채현, rRequestRelative=null, oldHouseNo=720011, cci=2020-11-21 :, upjang=비오토피아, fellowName=null, bookName=***, rRemarks=퇴실일 미정, cco=2023-08-17 :, relativeType=null, stayinDayCnt=40, realCcoDate=null, realStayinDayCnt=null, jata=null, gscName=김채현, rRelativeType=null}], sRoomNo=, loginVO=LoginVO [corpCode=01, empId=3076, empIp=0:0:0:0:0:0:0:1, empNo=3119, empName=김종부, passwordCode=1q2w3e^^, passwordPos=, useYn=Y, posLoginDate=, backLoginDate=, loginFlag=, passwordCheck=, authGroupCode=00001, perUpjangCode=null, loginLockYn=, authCode=, lastLoginDate=2023-03-10 14:15, lastLoginIp=192.168.31.1], sRelativeType=, sRoomType=, sEdDate=20230314, intPageSize=10000, sOwnerGuestName=, sStDate=20230202, sSearchName=, sManagementType=, state=CheckInPerformance.Select, page=1}
+
+* GridData
+[{"gscTelNo":null,"membersa":null,"roomNo":"C9-101","ownerGuestName":"김정주","rRequestRelative":null,"oldHouseNo":"309101","cci":"2021-06-28 :","upjang":"비오토피아","fellowName":null,"bookName":"김정주","rRemarks":null,"cco":"2023-12-15 :","relativeType":null,"stayinDayCnt":40,"realCcoDate":null,"realStayinDayCnt":null,"jata":null,"gscName":"김정주","rRelativeType":null},{"gscTelNo":null,"membersa":null,"roomNo":"West 11","ownerGuestName":"김채현","rRequestRelative":null,"oldHouseNo":"720011","cci":"2020-11-21 :","upjang":"비오토피아","fellowName":null,"bookName":"***","rRemarks":"퇴실일 미정","cco":"2023-08-17 :","relativeType":null,"stayinDayCnt":40,"realCcoDate":null,"realStayinDayCnt":null,"jata":null,"gscName":"김채현","rRelativeType":null},{}]
+
+* JsonData
+{JsonData={"Param":{"sStDate":"20230202","sEdDate":"20230314","sRoomType":"","sManagementType":"","sRelativeType":"","sOwnerGuestName":"","sRoomNo":"","sSearchName":"","state":"CheckInPerformance.Select"},
+"IdData":[{"key":"roomNo"},{"key":"ownerGuestName"},{"key":"cci"},{"key":"cco"},{"key":"stayinDayCnt"},{"key":"realCcoDate"},{"key":"realStayinDayCnt"},{"key":"jata"},{"key":"gscName"},{"key":"fellowName"},{"key":"gscTelNo"},{"key":"bookName"},{"key":"membersa"},{"key":"rRemarks"}],"Footer":{},
+"ExcelTitle":"입실실적현황",
+"NameData":[{"name":"객실번호","width":60},{"name":"소유자명","width":200},{"name":"입실일시","width":110},{"name":"퇴실일시","width":110},{"name":"숙박일수","width":80},{"name":"실퇴실일자","width":110},{"name":"실숙박일수","width":80},{"name":"이용구분","width":100},{"name":"투숙객명","width":100},{"name":"동숙자명","width":100},{"name":"연락처","width":100},{"name":"예약자명","width":100},{"name":"멤버사명","width":150},{"name":"비고","width":350}],"NoAlignData":[{"center":0},{"left":1},{"center":2},{"center":3},{"right":4},{"center":5},{"right":6},{"center":7},{"left":8},{"left":9},{"center":10},{"left":11},{"left":12},{"left":13}],"MergeData":[],"GroupHeaderData":[],"MergeYN":"Y",
+"GridData":[{"gscTelNo":null,"membersa":null,"roomNo":"C9-101","ownerGuestName":"김정주","rRequestRelative":null,"oldHouseNo":"309101","cci":"2021-06-28 :","upjang":"비오토피아","fellowName":null,"bookName":"김정주","rRemarks":null,"cco":"2023-12-15 :","relativeType":null,"stayinDayCnt":40,"realCcoDate":null,"realStayinDayCnt":null,"jata":null,"gscName":"김정주","rRelativeType":null},{"gscTelNo":null,"membersa":null,"roomNo":"West 11","ownerGuestName":"김채현","rRequestRelative":null,"oldHouseNo":"720011","cci":"2020-11-21 :","upjang":"비오토피아","fellowName":null,"bookName":"***","rRemarks":"퇴실일 미정","cco":"2023-08-17 :","relativeType":null,"stayinDayCnt":40,"realCcoDate":null,"realStayinDayCnt":null,"jata":null,"gscName":"김채현","rRelativeType":null},{}]}}
+
+
+
+{"ExcelTitle":"코드관리",
+"GridData":[{"head":"AM002","detailName":"행사유형","detailNameEn":"en_행사유형","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"AM003","detailName":"지급방법","detailNameEn":"en_지급방법","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"AM005","detailName":"행사진행상태","detailNameEn":"en_행사진행상태","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"AM006","detailName":"마켓구분","detailNameEn":"en_마켓구분","useYn":"예","detail":"*","displaySeq":"","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"AM008","detailName":"단체구분","detailNameEn":"en_단체구분","useYn":"아니오","detail":"*","displaySeq":"","item1":"연부킹여부","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"AM010","detailName":"지역코드","detailNameEn":"en_지역코드","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"우편번호지역명","item6":"우편번호여부","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BA001","detailName":"수납유형","detailNameEn":"en_수납유형","useYn":"아니오","detail":"*","displaySeq":"","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BA002","detailName":"음양구분","detailNameEn":"en_음양구분","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BA003","detailName":"영업장코드","detailNameEn":"en_영업장코드","useYn":"예","detail":"*","displaySeq":"","item1":"기간별입장객현황","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BA004","detailName":"기간별입장객현황","detailNameEn":"en_기간별입장객현황","useYn":"아니오","detail":"*","displaySeq":"","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BA005","detailName":"자동전표계정","detailNameEn":"en_자동전표계정","useYn":"아니오","detail":"*","displaySeq":"","item1":"사업장","item2":"영업장구분","item3":"거래처코드","item4":"거래처명","item5":"프로젝트코드","item6":"프로젝트명","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BA007","detailName":"매출일보","detailNameEn":"en_매출일보","useYn":"아니오","detail":"*","displaySeq":"","item1":"사업부문","item2":"구분","item3":"영업장(대)","item4":"영업장(중)","item5":"영업장(소)","item6":"단가","item7":"월목표","item8":"년목표","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BA008","detailName":"대매사판매여부","detailNameEn":"en_대매사판매여부","useYn":"예","detail":"*","displaySeq":"0","item1":"SALE_YN","item2":"TICKET_YN","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BIZ01","detailName":"기업관리 인증방법","detailNameEn":"en_기업관리 인증방법","useYn":"예","detail":"*","displaySeq":"","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS001","detailName":"영업장구분","detailNameEn":"en_영업장구분","useYn":"예","detail":"*","displaySeq":"0","item1":"UPJANG_DIV","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS002","detailName":"영업장유형","detailNameEn":"en_영업장유형","useYn":"예","detail":"*","displaySeq":"0","item1":"UPJANG_TYPE","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS003","detailName":"운영방식","detailNameEn":"en_운영방식","useYn":"예","detail":"*","displaySeq":"0","item1":"MANAGE_TYPE","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS004","detailName":"시작화면","detailNameEn":"en_시작화면","useYn":"예","detail":"*","displaySeq":"","item1":"SCREEN_TYPE","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS007","detailName":"상품타입","detailNameEn":"en_상품타입","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS011","detailName":"시즌구분","detailNameEn":"en_시즌구분","useYn":"예","detail":"*","displaySeq":"0","item1":"위터파크 시즌","item2":"","item3":"","item4":" 시즌","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS012","detailName":"영업구분","detailNameEn":"en_영업구분","useYn":"예","detail":"*","displaySeq":"0","item1":"휴일구분","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS013","detailName":"우대유형","detailNameEn":"en_우대유형","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS014","detailName":"우대구분","detailNameEn":"en_우대구분","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS015","detailName":"결제코드","detailNameEn":"en_결제코드","useYn":"예","detail":"*","displaySeq":"0","item1":"PAY_CODE","item2":"계정코드","item3":"증빙구분","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS016","detailName":"할인율 구분","detailNameEn":"en_할인율 구분","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS018","detailName":"대인/소인","detailNameEn":"en_대인/소인","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS020","detailName":"사업부문","detailNameEn":"en_사업부문","useYn":"예","detail":"*","displaySeq":"0","item1":"귀속부서","item2":"계정코드","item3":"","item4":"회계bizp_code","item5":"증빙구분","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS021","detailName":"상품권판매사유","detailNameEn":"en_상품권판매사유","useYn":"예","detail":"*","displaySeq":"0","item1":"sale_reason_code","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS022","detailName":"마감관리프로세스","detailNameEn":"en_마감관리프로세스","useYn":"예","detail":"*","displaySeq":"","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS023","detailName":"요일코드","detailNameEn":"en_요일코드","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS024","detailName":"이용권변경구분","detailNameEn":"en_이용권변경구분","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS025","detailName":"상품권상태구분","detailNameEn":"en_상품권상태구분","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS026","detailName":"접대구분","detailNameEn":"en_접대구분","useYn":"예","detail":"*","displaySeq":"0","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS029","detailName":"락카지역구분","detailNameEn":"en_락카지역구분","useYn":"예","detail":"*","displaySeq":"","item1":"","item2":"","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS032","detailName":"메뉴대분류","detailNameEn":"en_메뉴대분류","useYn":"예","detail":"*","displaySeq":"","item1":"대분류","item2":"설명","item3":"","item4":"","item5":"","item6":"","item7":"","item8":"","item9":"","item10":"","item11":"","item12":"","item13":"","item14":"","item15":""},{"head":"BS033","detailName":"메뉴중분류","detailNameE...
+
+
+
+001234 / userve0822
+
+================================================================================================================
+
+* 토스트/jq 그리드 비교
+
+* 토스트 그리드/ jq 그리드
+var targetInstance = $("#gr_List").getGrid();  // $("#gr_List").jqGrid('getGridParam');
+var columnNames = targetInstance.getColumns(); // $("#gr_List").jqGrid('getGridParam', 'colNames');
+var GroupHeaderArrayData = targetInstance.store.column.complexColumnHeaders; // var GroupHeaderArray = $("#gr_List").jqGrid("getGridParam", "groupHeader");
+ 
+
+
+@김종부
+○ 2023-03-14(화)
+1. 발생원인
+ a.
+
+2. 조치내역
+ a. 
+
+3. 개발 완료 후 검증방법(최대한 상세히 검증방법 기술 요청드립니다.)
+  a.
+  
+ 4. 반영 일자
+
+  a. DB반영 
+
+    없음
+
+  b. 소스반영
+    2023-03-14(화) 야간 운영 반영 예정이며,
+    2023-03-15(수) 부터 운영 확인 가능하십니다.
+    운영 반영 시 확인 후 INREVIEW 요청드리도록 하겠습니다.
+    감사합니다.
+
+===========================================================================
+
+* 테블릿 
+
+회원관리 이미지 pms 참고. base64 인코딩
+테이블 필요
+
+PMS
+ 비오토피아 - 주택수리접수현황 
+ 객실영업 - 객실수리접수현황
+ 파일형식 이미지형식인것만 base64 인코딩 해서 데이터 저장
+
+MOBILE
+ 이미지 저장 할때 FTP -> BASE64 인코딩 해서 데이터 저장
+ - 비오토피아 APP IMAGE SRC 변경
+ - 객실정비  APP    
+
+ ===============================================================================
+
+* 정연호 선임 업무
+골프예약추천인변경관리 => 추천자 검색에서 신규화면(회원 골프 예약/이용실적 조회) 생성 (검색조건: 고객구분, 멤버사, 고객번호 추가) => 조건 검색은 골프예약추천인변경관리 참고
+“엑셀” 클릭 시 개인에 대한 데이터가 아닌, 회원 명단에 대한 데이터가 변환 되도록 부탁 드립니다. 
+(고객번호 기준으로 출력??)
+관계사/멤버사 차이??
+잔여횟수는 계에서 제한일수 빼면 됨(회원관리 페이지 혜택 탭 참고)
+
+* 질문사항
+1) 엑셀 변환 시 회원번호 기준으로 데이터 출력 
+2) 잔여횟수(년 기준) = 제한일수 - 계
+3) 잔여횟수는 계에서 제한일수 빼면 됨(회원관리 페이지 혜택 탭 참고)
+4) 관계사/멤버사 같음
+5) 2023년 기본세팅
+6) 히든처리 엑셀 처리
+
+회원 골프 예약/이용실적 조회
+
+* 수정내용
+
+* 원복내용
+
+기준년도 하드코딩 파라미터 넘겨주지 않음
+
+?? 기준년도: 쿼리 조건절X
+
+--고객구분(CRA01M) : C01.MEM_TYPE 
+--고객명(CRA01M): C01.MEM_NAME
+?? 멤버사(CRA05M): RELATION_TYPE
+
+고객번호 : C01.GUEST_NO, 
+
+- BSH01M 월력정보(월려코드, 영업년월일)
+- RSA50S 골프예약(예약번호, 예약타임순번)
+- RSA52S 골프타임시트(일자, 코스, 시간)
+
+==================================================================
+
+2023-03-23(목)
+회원 골프 예약/이용실적 조회 수정
+
+완료 - 고객번호 묶음 처리 : 반영일자 잡아야 함
+완료 - 법인pkg 잔여횟수 카운트
+완료 - 풋터 카운트 합계 넣어주기
+완료 - 엑셀 잔여횟수 넣어주기
+엑셀 현재날짜 넣어주기
+
+=========================================================
+* 테블릿 
+
+회원관리 이미지 pms 참고. base64 인코딩
+테이블 필요
+
+PMS
+ 비오토피아 - 주택수리접수현황 
+ 객실영업 - 객실수리접수현황
+ 파일형식 이미지형식인것만 base64 인코딩 해서 데이터 저장
+
+MOBILE
+ 이미지 저장 할때 FTP -> BASE64 인코딩 해서 데이터 저장
+ - 비오토피아 APP IMAGE SRC 변경
+ - 객실정비  APP  
+
+* PMS 이미지 업로드 파악 (uploadFiles1 => ImageIO(리사이즈, 확장자) => Encoder => param.put)
+param : {memName=종부킴, imgOrgName=dog, mode=U, podoRoomBeneDivMngt=A006, guestZipCode=, joinDate=20230127, guestTelNo=, sexName=M, manageMemo=, guestAddr2=, guestAddr1=, marrYnName=N, memType=006, marrDate=, loginFailCnt=0, dmType=1, imgUpYn=Y, theAnnexRoomBeneDivMngt=A006, guestNo=30008340, imgPath=dog.jpeg, idx=01, resNoShown=, guestType=002, birthday=, officePosition=, dcTypeCode=, memEngName=, imgName=dog.jpeg, memGrade=, areaType=002, memNo=CP098400, hpNo=01066613076, useYn=Y, email=, nationCode=KOR, bizpNo=, smsSendYnName=Y, officeCorpNo=, userId=, userPasswd=, resNo=, remarks=}
+loginVO : LoginVO [corpCode=01, empId=3076, empIp=0:0:0:0:0:0:0:1, empNo=3119, empName=김종부, passwordCode=1q2w3e^^, passwordPos=, useYn=Y, posLoginDate=, backLoginDate=, loginFlag=, passwordCheck=, authGroupCode=00001, perUpjangCode=null, loginLockYn=, authCode=, lastLoginDate=2023-03-16 14:34, lastLoginIp=192.168.31.1]
+mode : U 
+List<MultipartFile> uploadFiles1 : [org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile@3b583c]
+MultipartFile uploadFile1 : org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile@3b583c
+BufferedImage Image(리사이즈) : BufferedImage@3784fe: type = 5 ColorModel: #pixelBits = 24 numComponents = 3 color space = java.awt.color.ICC_ColorSpace@1ce5e37 transparency = 1 has alpha = false isAlphaPre = false ByteInterleavedRaster: width = 180 height = 216 #numDataElements 3 dataOff[0] = 2
+String extension : jpeg
+ImageIO.write(Image, extension, baos);
+StringBuilder sb : 없음
+Encoder encoder : java.util.Base64$Encoder@d56b86
+byte[] encodedBytes : [47, 57, 106, 47, 52, 65, 65, 81, 83, 107, 90, 74, 82, 103, 65, 66, 65, 103, 65, 65, 65, 81, 65, 66, 65, 65, 68, 47, 50, 119, 66, 68, 65, 65, 103, 71, 66, 103, 99, 71, 66, 81, 103, 72, 66, 119, 99, 74, 67, 81, 103, 75, 68, 66, 81, 78, 68, 65, 115, 76, 68, 66, 107, 83, 69, 119, 56, 85, 72, 82, 111, 102, 72, 104, 48, 97, 72, 66, 119, 103, 74, 67, 52, 110, 73, 67, 73, 115, 73, 120, 119, 99, 75, 68, 99, 112, 76, 68, 65, 120, 78, 68, 81, 48, 72, 121, 99, 53, 80, 84, 103, 121, 80, 67, 52, 122, 78, 68, 76, 47, 50, 119, 66, 68, 65, 81, 107, 74, 67, 81, 119, 76, 68, 66, 103, 78, 68, 82, 103, 121, 73, 82, 119, 104, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 73, 121, 77, 106, 76, 47, 119, 65, 65, 82, 67, 65, 68, 89, 65, 76, 81, 68, 65, 83, 73, 65, 65, 104, 69, 66, 65, 120, 69, 66, 47, 56, 81, 65, 72, 119, 65, 65, 65, 81, 85, 66, 65, 81, 69, 66, 65, 81, 69, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 69, 67, 65, 119, 81, 70, 66, 103, 99, 73, 67, 81, 111, 76, 47, 56, 81, 65, 116, 82, 65, 65, 65, 103, 69, 68, 65, 119, 73, 69, 65, 119, 85, 70, 66, 65, 81, 65, 65, 65, 70, 57, 65, 81, 73, 68, 65, 65, 81, 82, 66, 82, 73, 104, 77, 85, 69, 71, 69, 49, 70, 104, 66, 121, 74, 120, 70, 68, 75, 66, 107, 97, 69, 73, 73, 48, 75, 120, 119, 82, 86, 83, 48, 102, 65, 107, 77, 50, 74, 121, 103, 103, 107, 75, 70, 104, 99, 89, 71, 82, 111, 108, 74, 105, 99, 111, 75, 83, 111, 48, 78, 84, 89, 51, 79, 68, 107, 54, 81, 48, 82, 70, 82, 107, 100, 73, 83, 85, 112, 84, 86, 70, 86, 87, 86, 49, 104, 90, 87, 109, 78, 107, 90, 87, 90, 110, 97, 71, 108, 113, 99, 51, 82, 49, 100, 110, 100, 52, 101, 88, 113, 68, 104, 73, 87, 71, 104, 52, 105, 74, 105, 112, 75, 84, 108, 74, 87, 87, 108, 53, 105, 90, 109, 113, 75, 106, 112, 75, 87, 109, 112, 54, 105, 112, 113, 114, 75, 122, 116, 76, 87, 50, 116, 55, 105, 53, 117, 115, 76, 68, 120, 77, 88, 71, 120, 56, 106, 74, 121, 116, 76, 84, 49, 78, 88, 87, 49, 57, 106, 90, 50, 117, 72, 105, 52, 43, 84, 108, 53, 117, 102, 111, 54, 101, 114, 120, 56, 118, 80, 48, 57, 102, 98, 51, 43, 80, 110, 54, 47, 56, 81, 65, 72, 119, 69, 65, 65, 119, 69, 66, 65, 81, 69, 66, 65, 81, 69, 66, 65, 81, 65, 65, 65, 65, 65, 65, 65, 65, 69, 67, 65, 119, 81, 70, 66, 103, 99, 73, 67, 81, 111, 76, 47, 56, 81, 65, 116, 82, 69, 65, 65, 103, 69, 67, 66, 65, 81, 68, 66, 65, 99, 70, 66, 65, 81, 65, 65, 81, 74, 51, 65, 65, 69, 67, 65, 120, 69, 69, 66, 83, 69, 120, 66, 104, 74, 66, 85, 81, 100, 104, 99, 82, 77, 105, 77, 111, 69, 73, 70, 69, 75, 82, 111, 98, 72, 66, 67, 83, 77, 122, 85, 118, 65, 86, 89, 110, 76, 82, 67, 104, 89, 107, 78, 79, 69, 108, 56, 82, 99, 89, 71, 82, 111, 109, 74, 121, 103, 112, 75, 106, 85, 50, 78, 122, 103, 53, 79, 107, 78, 69, 82, 85, 90, 72, 83, 69, 108, 75, 85, 49, 82, 86, 86, 108, 100, 89, 87, 86, 112, 106, 90, 71, 86, 109, 90, 50, 104, 112, 97, 110, 78, 48, 100, 88, 90, 51, 101, 72, 108, 54, 103, 111, 79, 69, 104, 89, 97, 72, 105, 73, 109, 75, 107, 112, 79, 85, 108, 90, 97, 88, 109, 74, 109, 97, 111, 113, 79, 107, 112, 97, 97, 110, 113, 75, 109, 113, 115, 114, 79, 48, 116, 98, 97, 51, 117, 76, 109, 54, 119, 115, 80, 69, 120, 99, 98, 72, 121, 77, 110, 75, 48, 116, 80, 85, 49, 100, 98, 88, 50, 78, 110, 97, 52, 117, 80, 107, 53, 101, 98, 110, 54, 79, 110, 113, 56, 118, 80, 48, 57, 102, 98, 51, 43, 80, 110, 54, 47, 57, 111, 65, 68, 65, 77, 66, 65, 65, 73, 82, 65, 120, 69, 65, 80, 119, 68, 122, 56, 76, 103, 85, 47, 72, 83, 106, 116, 122, 81, 79, 111, 113, 68, 113, 72, 65, 85, 100, 113, 68, 57, 54, 103, 48, 65, 75, 77, 89, 111, 80, 78, 75, 111, 52, 111, 55, 85, 65, 73, 66, 85, 111, 81, 107, 106, 105, 110, 50, 99, 66, 110, 110, 67, 65, 57, 101, 108, 100, 98, 89, 43, 72, 108, 100, 70, 90, 47, 88, 112, 87, 86, 83, 114, 71, 110, 117, 88, 71, 68, 108, 115, 89, 57, 112, 112, 85, 106, 104, 88, 50, 110, 71, 82, 86, 54, 80, 119, 43, 53, 85, 72, 110, 80, 71, 82, 88, 85, 76, 97, 114, 69, 78, 113, 112, 119, 75, 103, 78, 119, 115, 99, 103, 72, 98, 78, 101, 102, 76, 71, 83, 98, 48, 79, 113, 79, 72, 48, 77, 118, 47, 104, 71, 110, 82, 110, 99, 90, 80, 98, 54, 86, 122, 43, 112, 97, 90, 79, 108, 48, 54, 104, 67, 86, 88, 97, 117, 102, 88, 73, 114, 49, 71, 74, 107, 101, 65, 72, 115, 82, 122, 86, 75, 53, 115, 73, 74, 84, 108, 48, 66, 53, 68, 102, 106, 86, 82, 120, 84, 84, 49, 73, 57, 108, 102, 81, 56, 55, 88, 82, 88, 56, 107, 79, 43, 101, 51, 83, 113, 99, 49, 113, 48, 74, 119, 119, 89, 77, 80, 56, 65, 57, 90, 114, 48, 112, 114, 83, 73, 112, 116, 67, 103, 68, 72, 83, 115, 121, 43, 48, 101, 79, 53, 79, 52, 100, 99, 47, 47, 65, 70, 118, 54, 86, 99, 77, 88, 100, 54, 104, 75, 104, 112, 111, 101, 102, 70, 71, 122, 121, 77, 69, 52, 112, 104, 66, 72, 85, 89, 114, 116, 76, 110, 119, 50, 114, 119, 116, 53, 89, 50, 115, 79, 81, 102, 56, 65, 80, 48, 114, 108, 98, 117, 49, 101, 50, 99, 112, 74, 57, 52, 102, 53, 47, 114, 88, 88, 84, 114, 82, 110, 115, 89, 121, 103, 52, 55, 108, 83, 106, 80, 80, 116, 85, 118, 108, 47, 74, 110, 103, 90, 74, 65, 122, 84, 65, 112, 72, 52, 49, 113, 81, 78, 80, 87, 109, 109, 110, 52, 120, 48, 112, 112, 111, 69, 78, 112, 119, 54, 48, 50, 108, 66, 111, 65, 100, 105, 105, 103, 72, 105, 105, 103, 108, 105, 72, 54, 85, 68, 105, 107, 80, 87, 108, 72, 87, 103, 89, 55, 118, 82, 84, 99, 48, 113, 56, 48, 68, 72, 100, 113, 71, 80, 70, 70, 74, 49, 120, 57, 97, 65, 79, 103, 56, 78, 50, 120, 108, 117, 86, 89, 112, 108, 66, 51, 114, 118, 55, 83, 77, 118, 74, 108, 82, 107, 76, 88, 77, 101, 72, 89, 66, 66, 112, 106, 84, 107, 89, 56, 120, 115, 103, 101, 103, 114, 113, 78, 77, 110, 81, 75, 99, 110, 79, 97, 56, 98, 70, 122, 53, 112, 50, 79, 43, 106, 71, 48, 76, 108, 117, 90, 69, 86, 87, 98, 106, 106, 114, 88, 75, 51, 50, 102, 116, 73, 86, 102, 88, 65, 114, 99, 49, 80, 85, 69, 103, 104, 90, 77, 103, 115, 99, 65, 52, 114, 71, 103, 47, 48, 105, 84, 122, 84, 110, 65, 53, 122, 88, 76, 72, 101, 53, 49, 81, 86, 108, 100, 109, 51, 65, 47, 56, 65, 111, 52, 72, 115, 75, 99, 48, 109, 82, 109, 113, 121, 80, 103, 101, 51, 83, 108, 97, 81, 103, 68, 109, 109, 122, 78, 82, 72, 66, 118, 109, 71, 101, 51, 87, 109, 104, 43, 101, 101, 49, 82, 104, 117, 67, 101, 110, 70, 78, 68, 70, 106, 117, 122, 109, 104, 70, 87, 76, 97, 52, 73, 120, 54, 49, 109, 97, 108, 52, 102, 83, 57, 72, 109, 113, 80, 109, 122, 86, 50, 77, 56, 49, 102, 106, 107, 120, 71, 101, 118, 83, 114, 112, 122, 99, 72, 100, 71, 86, 83, 70, 48, 101, 97, 51, 117, 108, 83, 50, 55, 72, 122, 73, 102, 107, 120, 103, 69, 110, 118, 87, 82, 74, 71, 86, 51, 77, 101, 77, 110, 65, 114, 48, 113, 89, 120, 122, 108, 107, 99, 66, 118, 113, 75, 53, 76, 87, 57, 75, 101, 51, 119, 51, 51, 111, 122, 107, 106, 50, 47, 122, 120, 88, 112, 85, 77, 84, 122, 117, 122, 79, 87, 114, 82, 99, 100, 84, 110, 71, 52, 70, 77, 78, 83, 79, 67, 68, 122, 85, 82, 78, 100, 112, 122, 104, 81, 66, 83, 100, 113, 77, 56, 85, 65, 83, 76, 48, 111, 112, 75, 75, 90, 78, 120, 77, 56, 48, 100, 97, 68, 122, 81, 75, 81, 120, 99, 85, 111, 111, 55, 85, 89, 111, 71, 76, 84, 107, 65, 51, 65, 72, 112, 81, 79, 66, 86, 114, 84, 98, 99, 88, 86, 47, 70, 69, 102, 117, 107, 56, 48, 109, 55, 75, 52, 48, 114, 115, 55, 81, 89, 116, 100, 75, 104, 105, 88, 106, 97, 111, 54, 101, 116, 79, 116, 76, 120, 107, 106, 76, 65, 106, 78, 82, 88, 120, 67, 119, 43, 87, 111, 52, 65, 119, 75, 121, 89, 87, 107, 122, 47, 70, 106, 72, 80, 80, 97, 118, 68, 107, 117, 90, 116, 110, 115, 85, 49, 97, 78, 106, 88, 110, 76, 88, 120, 100, 105, 119, 50, 100, 77, 43, 47, 112, 86, 117, 51, 84, 121, 107, 85, 100, 115, 89, 78, 85, 73, 74, 89, 107, 67, 81, 120, 77, 83, 79, 112, 76, 100, 84, 43, 70, 88, 52, 83, 101, 112, 80, 52, 52, 54, 49, 76, 86, 116, 65, 98, 117, 87, 108, 43, 55, 107, 110, 53, 99, 49, 69, 55, 72, 100, 103, 90, 73, 112, 100, 119, 120, 110, 65, 57, 79, 79, 57, 79, 71, 65, 80, 101, 111, 66, 97, 68, 108, 85, 116, 71, 88, 66, 71, 66, 54, 48, 119, 65, 107, 77, 84, 49, 122, 54, 86, 90, 65, 43, 88, 106, 66, 72, 99, 89, 113, 70, 101, 70, 74, 120, 54, 65, 85, 67, 117, 67, 118, 56, 50, 79, 119, 113, 49, 71, 120, 50, 110, 110, 107, 49, 82, 74, 67, 118, 103, 69, 56, 56, 107, 52, 54, 86, 80, 72, 73, 80, 84, 78, 65, 83, 82, 82, 100, 105, 108, 52, 43, 82, 120, 110, 105, 114, 69, 116, 117, 108, 57, 98, 43, 87, 52, 53, 80, 73, 112, 108, 120, 69, 114, 88, 97, 115, 112, 122, 107, 99, 49, 97, 82, 100, 117, 51, 72, 97, 110, 122, 79, 76, 117, 103, 108, 70, 83, 105, 101, 100, 54, 51, 98, 47, 65, 71, 101, 56, 100, 65, 77, 65, 99, 86, 107, 107, 86, 50, 72, 106, 83, 48, 67, 116, 70, 99, 114, 47, 65, 66, 99, 77, 80, 101, 117, 81, 55, 86, 55, 108, 67, 102, 78, 66, 77, 56, 113, 111, 114, 83, 97, 71, 100, 75, 79, 49, 75, 101, 75, 98, 109, 116, 105, 65, 122, 82, 82, 110, 54, 85, 85, 69, 107, 110, 81, 90, 112, 113, 110, 78, 68, 110, 106, 70, 78, 88, 112, 83, 71, 83, 52, 111, 74, 57, 113, 85, 100, 75, 81, 106, 105, 103, 89, 55, 80, 70, 98, 51, 104, 83, 77, 78, 102, 83, 117, 102, 52, 69, 52, 43, 116, 99, 47, 88, 85, 101, 69, 119, 70, 106, 117, 88, 47, 105, 54, 65, 49, 104, 105, 72, 97, 109, 122, 83, 107, 114, 122, 82, 111, 51, 106, 69, 115, 81, 101, 80, 101, 111, 76, 110, 75, 87, 115, 99, 74, 106, 82, 83, 51, 85, 106, 118, 85, 108, 54, 120, 68, 66, 115, 99, 107, 56, 89, 113, 101, 67, 77, 51, 76, 75, 122, 56, 113, 79, 77, 101, 57, 101, 85, 116, 69, 101, 111, 120, 117, 110, 50, 113, 82, 119, 106, 99, 106, 69, 106, 71, 82, 50, 80, 118, 87, 104, 116, 51, 100, 77, 102, 108, 83, 113, 78, 103, 65, 122, 120, 50, 72, 112, 85, 113, 106, 71, 77, 56, 102, 121, 70, 90, 121, 100, 50, 67, 73, 103, 114, 66, 115, 53, 52, 80, 66, 80, 112, 85, 121, 56, 47, 75, 82, 121, 75, 106, 121, 88, 99, 66, 104, 51, 55, 72, 116, 47, 107, 48, 112, 89, 113, 81, 77, 106, 51, 78, 83, 85, 84, 108, 56, 90, 65, 74, 80, 79, 101, 102, 56, 43, 57, 80, 88, 72, 108, 56, 56, 72, 106, 116, 86, 85, 80, 110, 110, 100, 119, 122, 89, 53, 57, 80, 112, 43, 100, 83, 55, 122, 117, 50, 52, 65, 120, 48, 47, 119, 65, 47, 108, 84, 74, 71, 84, 73, 99, 100,...
+ param.put("imgPath", sb.toString()); : {emailYnName=N, officeName=, corpIndivCodeName=001, golfBeneDivMngt=008, memName=종부킴, lunarCodeName=1, bindUserId=, imgOrgName=dog, relation=005, vipYnName=N, mode=U, podoRoomBeneDivMngt=A006, guestZipCode=, joinDate=20230127, guestTelNo=, sexName=M, manageMemo=, guestAddr2=, guestAddr1=, marrYnName=N, memType=006, marrDate=, loginFailCnt=0, dmType=1, imgUpYn=Y, theAnnexRoomBeneDivMngt=A006, guestNo=30008340, imgPath=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, idx=01, resNoShown=, guestType=002, birthday=, officePosition=, dcTypeCode=, memEngName=, imgName=dog.jpeg, memGrade=, areaType=002, memNo=CP098400, hpNo=01066613076, useYn=Y, email=, nationCode=KOR, bizpNo=, smsSendYnName=Y, officeCorpNo=, userId=, userPasswd=, resNo=, remarks=}
+
+
+* 모바일 이미지 업로드 파악
+loginVO : LoginVO [corpCode=01, empId=3076, empIp=0:0:0:0:0:0:0:1, empNo=3119, empName=김종부, levelDiv= , passwordCode=1q2w3e^^, passwordPos=, useYn=Y, posLoginDate=, backLoginDate=, loginFlag=, passwordCheck=, authGroupCode=00001, perUpjangCode=2301, loginLockYn=, authCode=, lastLoginDate=, lastLoginIp=]
+imagePath : HouseRepair/01/
+param : {cleanMemo=, etcMemo=, upjangCode=2101, imgAdd=Y, equipMemo=, imgeUrl=, checkRoomNo=101, houseType=W, type=add, imgOrgName1=dog}
+boolean SAVE_CHECK : true
+result : {cleanMemo=, O_RESULT=1, upjangCode=2101, imgAdd=Y, imgeUrl=, loginVO=LoginVO [corpCode=01, empId=3076, empIp=0:0:0:0:0:0:0:1, empNo=3119, empName=김종부, levelDiv= , passwordCode=1q2w3e^^, passwordPos=, useYn=Y, posLoginDate=, backLoginDate=, loginFlag=, passwordCheck=, authGroupCode=00001, perUpjangCode=2301, loginLockYn=, authCode=, lastLoginDate=, lastLoginIp=], houseType=W, type=add, etcMemo=, equipMemo=, O_MSG=null, O_NO=2023032701, checkRoomNo=101, imgOrgName1=dog}
+String imgAdd : Y
+param.put("acceptNo", result.get("O_NO").toString());
+folderName : HouseRepair/01   
+Iterator<String> files : java.util.LinkedHashMap$LinkedKeyIterator@60260
+String uploadFile = files.next(); : 1
+String fileName = CommonUtil.makeRandomFilename(); : 1679885414293he
+List<MultipartFile> uploadFiles1 : [org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile@2bf633]
+MultipartFile uploadFile1 = uploadFiles1.get(0); : org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile@2bf633
+uploadFiles1 : [org.springframework.web.multipart.support.StandardMultipartHttpServletRequest$StandardMultipartFile@338683]
+resultJSON : {O_RESULT=1, fileSize=80592, fileExtension=jpeg, savePath=HouseRepair/01/, fileOrgName=dog.jpeg, fileSaveName=1679885414293he.jpeg}
+
+
+
+* 핵심
+resultJSON = sysCommonService.ftpFileUpload(uploadFile1,param,folderName,fileName);
+ ※ resultJSON = {O_RESULT=1, fileSize=80592, fileExtension=jpeg, savePath=HouseRepair/01/, fileOrgName=dog.jpeg, fileSaveName=1679643139273xg.jpeg}
+
+result = tabletBitoMapper.BioReg_Img_Insert(param);
+ ※ param = {O_RESULT=1, imgAdd=Y, progressMemo=, loginVO=LoginVO [corpCode=01, empId=3076, empIp=0:0:0:0:0:0:0:1, empNo=3119, empName=김종부, levelDiv= , passwordCode=1q2w3e^^, passwordPos=, useYn=Y, posLoginDate=, backLoginDate=, loginFlag=, passwordCheck=, authGroupCode=00001, perUpjangCode=2301, loginLockYn=, authCode=, lastLoginDate=, lastLoginIp=], insEmpNo2=3119, acceptNo=2023032401, hidImgUpYn=, insEmpNo1=3119, cnt=2, type=edit, acceptNo2=2023032401, acceptNo1=2023032401, orgFileName=1679643139273xg.jpeg, imgPath2=HouseRepair/01/1679640614931ma.jpeg, 1=, 2=, imgPath1=HouseRepair/01/1679640613629jg.jpeg, imgSeq1=1, O_MSG=null, imgSeq2=2, imgOrgName2=HouseRepair/01/1679640614931ma.jpeg, imgOrgName3=dog, newUploadFile=HouseRepair/01/1679643139273xg.jpeg, imgOrgName1=HouseRepair/01/1679640613629jg.jpeg}
+
+* 현재 BASE64인코딩 새로만든 테이블 인서트
+1. PMS(객실수리접수현황,주택수리요청접수), Tablet
+ 1) 이미지 넣을 때 BASE64 변환 후 테이블 INSERT
+
+2. 테블릿
+ 1) url src 경로 가져오기(회원관리)
+
+
+{cleanMemo=, O_RESULT=1, imgAdd=Y, upjangCode=2101, reqEmpName=김종부, reqEmpNo=3119, loginVO=LoginVO [corpCode=01, empId=3076, empIp=0:0:0:0:0:0:0:1, empNo=3119, empName=김종부, passwordCode=1q2w3e^^, passwordPos=, useYn=Y, posLoginDate=, backLoginDate=, loginFlag=, passwordCheck=, authGroupCode=00001, perUpjangCode=null, loginLockYn=, authCode=, lastLoginDate=2023-03-16 14:34, lastLoginIp=192.168.31.1], hidImgUpYn=, acceptNo=2023032701, cnt=, type=edit, etcMemo=, equipMemo=, O_MSG=null, O_NO=2023032701, imgEdit=Y, imgPath=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, imgOrgName1=dog}
+
+
+
+							 // base64업로드
+							 BufferedImage Image =  Resize(uploadFile1.getInputStream(), 180, 216);
+							 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							 String extension = FilenameUtils.getExtension(uploadFile1.getOriginalFilename()); // 확장자
+							 ImageIO.write(Image, extension, baos);
+							
+							 StringBuilder sb = new StringBuilder();  // 이미지를 문자열로
+							 Encoder encoder = Base64.getEncoder();
+							 byte[] encodedBytes = encoder.encode(baos.toByteArray());
+											sb.append(new String(encodedBytes));	
+							 
+							 param.put("imgPath", sb.toString());
+							 
+							 param.put("newUploadFile", resultJSON.get("savePath").toString() + resultJSON.get("fileSaveName").toString());
+							 param.put("orgFileName", resultJSON.get("fileSaveName").toString());
+							 result = btmMngtMapper.HouseRepairRequestReq_Img_Insert(param);
+
+ {cleanMemo=, O_RESULT=1, imgSeq=1, imgAdd=, upjangCode=2101, reqEmpName=김종부, reqEmpNo=3119, 
+ loginVO=LoginVO [corpCode=01, empId=3076, empIp=0:0:0:0:0:0:0:1, empNo=3119, empName=김종부, p
+ asswordCode=1q2w3e^^, passwordPos=, useYn=Y, posLoginDate=, backLoginDate=, loginFlag=, passwordCheck=,
+  authGroupCode=00001, perUpjangCode=null, loginLockYn=, authCode=, 
+  lastLoginDate=2023-03-16 14:34, lastLoginIp=192.168.31.1], hidImgUpYn=, acceptNo=2023032701, 
+  insEmpNo1=3119, cnt=1, type=edit, acceptNo1=2023032701, orgFileName=cat.jpg, etcMemo=,
+  imgPath1=HouseRepair/01/dog.jpeg, equipMemo=, imgSeq1=1, O_MSG=null, O_NO=2023032701, imgEdit=Y,\
+   newUploadFile=HouseRepair/01/cat.jpg, imgOrgName1=cat}              
+
+
+
+1. 객실수리접수현황 
+완료 - BASE64 인코딩 테이블 인서트, 업데이트, 삭제 
+
+2. 주택수리요청접수
+완료 - BASE64 인코딩 테이블 인서트, 업데이트, 삭제
+
+3. 테블릿
+BASE64 인코딩 테이블 인서트, 업데이트, 삭제
+url src 경로 가져오기(회원관리)
+
+완료 - 시설정비 요청 RoomReg.do
+완료 - 분실물 접수 등록 RoomLostFoundReg.do
+시설정비 현황 사진 셀렉트
+ 1) 상세보기 : RoomRegRetrieveInfo.do
+ 2) 수정 : RoomRegRetrieveModify.do
+
+
+* PMS
+PKG_HouseRepairRequestReq.SP_IMG_INSERT2 추가
+PKG_HouseRepairRequestReq.SP_IMG_UPDATE2 추가
+PKG_HouseRepairRequestReq.SP_IMG_DELETE 수정
+
+
+* 테블릿
+PKG_ROOMREG.SP_IMG_INSERT2 추가
+PKG_ROOMLOSTFOUNDREG.SP_IMG_INSERT2 추가
+PKG_TABLETBITOREPAIR.SP_IMG_INSERT2 추가
+PKG_TABLETBITOREPAIR.SP_IMG_DELETE 수정
+PKG_TABLETBITOREPAIR.SP_IMG_SELECT 수정
+
+
+data:image/jpeg;base64,+item.picture
+
+완료 - 이용실적 조회 병합처리 테스트
+
+======================================================
+
+* 온천락카판매등록
+락카 테이블: id="lockerTable"
+온천락카입장등록: insertForm
+동반자 내역: gr_Partner
+아래 왼쪽 그리드: gr_RentItemList
+아래 오른쪽 폼 그 아래 그리드: gr_record
+현재 주석처리: gr_PartnerSubList
+
+- 1명
+현재 하나의 락커 선택 => 온천락카입장등록 입력 => 저장
+- 동반객
+해당 락커 선택 => 복사 => 온천락카입장등록 입력 => 저장
+
+- 변경
+해당/동반 락커 클릭 => 선택 => 로우 생성
+
+* 지금 작업 집중
+완료 - 배정된 건 온클릭 안되게 함, 더블클릭하면 타게 함
+선택시 로우 생성, 해제시 로우 삭제
+
+* 궁금사항
+selrow1 왜 전역변수??
+keyObj[keyNo];
+f_isValidate 함수??
+
+
+		if($(this).hasClass("click")){
+		    $(this).removeClass("click");
+		} else{
+		    $(this).addClass("click");
+		}
+
+========================================================
+
+적용 : 체크된 ROW의 입력된 폼 임시 적용
+
+일괄적용 : 모든 ROW의 입력된 폼 임시 적용
+
+저장[F7] : 모든 그리드 데이터 저장
+
+복사: 락카선택하면 락카번호 인풋 
+
+테이블 : GFH02M: 온천 입장(동반객) 관리(pk: 업장코드, 영업일자, 키주소, 락카번호, 성별)
+
+  //그리드 값 넣기
+   if(grid.getRowCount() > 0){
+  		 if($("#gr_Partner").getRowData(0).keyAddress == null) {
+	   		 grid.setValue(rowId,'keyAddress', keyAddress);
+	 	 }else{
+	 	 	 grid.setValue(rowId,'keyAddress', $("#gr_Partner").getRowData(0).keyAddress);
+	 	 }
+ 	}
+
+락카번호 keyNo
+이용자 guestName
+고객번호 guestNo
+멤버사 relativeType
+고객구분 memType
+주택번호 roomNo
+입장객구분 entDiv
+성별 sex
+지불락카 payLockNo
+온천요금 menuCode
+입장금약 saleAmt
+헬스장 gymYn
+수영장 spaYn
+비고 remarks
+멤버사 relativeTypeCode
+고객구분 memTypeCode
+
+
+셀렉트 쿼리 memTypeCode, relativeTypeCode 추가해줘야 함 
+
+* 수정내용
+PKG_SpaLockerSalesRegistration.SP_POP_COMPANION_SELECT 셀렉트 컬럼만 추가
+PKG_SpaLockerSalesRegistration.SP_DELETE2 추가
+
+* 질문내용
+삭제시 입장내역 GFH03M 테이블에 SEQ_NO 무시하고 삭제??
+그리드 순서 정렬순서?? ENTER_TIME: 'HH24:MI' => 'HH24:MI:SS'  / varchar(5바이트)
+
+* 해야할 일
+완료 - 삭제 기능 구현
+완료 - 적용, 일괄적용 기능 구현
+완료 - 키어드레스 넣어주기
+완료 - 지불락카
+완료 - 키 생성 프로시저 삭제
+완료 - 신규 시 키주소 생성 인서트
+완료 - 그리드 바인드 폼값 다 확인 가능하게 
+완료 - 등록시/삭제시 해당 그리드 유지 
+완료 - 더블클릭 해당 번호에 그리드 선택
+완료 - 복사 후 락카 클릭해서 해당 락카번호 등록가능하게
+검토- 초기화 검사(신규등록시)
+
+- 아래 댓글 표시
+완료 - 지불락카 필수값 제거
+완료 - 삭제2 생성(테이블 GFH03M 추가/ PAY_KEYNO(지불락카) 주석처리)
+완료 - 지불락카 바인드 
+완료 - 락카번호 disabled 처리
+완료 - 초기화 디폴트 기존대로(기타이용객/헬스장N/수영장N )
+완료 - 유효성 검사 for문
+적용, 일괄적용 유효성 검사 필수값
+
+=======================================================================================
+
+* 고정락카 등록
+- 관리화면 추가
+- 내장객접수등록 고정락카 jsp: Locker, LockerFixPop
+
+====================================
+다음주 목요일까지
+
+완료 - 칼럼 히스토리 히든처리(고객번호, 입장객구분)
+완료 - 주택번호 영어 숫자만 입력
+
+
+락카타입(GB105): 남자(001), 여자(002), 가상(003)
+락카상태(GB106): 사용가능(001), 고장(수리중)(002), 불량(미사용)(003)
+
+ * 수정내용
+0) 메인화면 락카 색상표시
+PKG_SpaLockerSalesRegistration.SP_SELECT2 추가
+PKG_SpaLockerSalesRegistration.SP_LOCKER_SELECT 수정 (※ 조건절 PAID_YN = 'N' 추가)
+
+1) 락카 일괄 저장
+- PKG_SpaLockerSalesRegistration.SP_POP_COMPANION_SELECT 셀렉트 컬럼만 추가
+- PKG_SpaLockerSalesRegistration.SP_DELETE2 추가
+
+2) 고정락카
+- GFH01D 고정락카 관리 테이블 생성 
+- PKG_SPALOCKERFIXPOP 패키지 생성
+- PKG_SpaLockerSalesRegistration.SP_COMPANION_SELECT 수정 
+
+3) 고장락카
+- GFH01B 고정락카 관리 테이블 생성 
+- PKG_SPALOCKERFIXPOP 패키지 생성
+
+
+* 질문내용
+- 등록된 락카도 이름팁 나오게??
+- 고정락카 체크박스 등록 종료일자는 하루만 추가
+- 고장락카 상태 내장객 락카 수정, 고정락카 수정 가능하게 함
+
+* 고장락카 등록
+- 버튼 고장처리(고장처리 상태인 경우 고장해제)
+- 공통코드 : RB008 정상(001), 고장(002), 수리중(003) - 고장락카
+            GF009 사용가능(001), 사용중(002), 고장(수리중)(003) - 락카마스터
+
+- 고장처리 시 
+ 1. 히스토리 생성(시작일자/요청자/비고 인서트)
+ 2. 락카정보등록 페이지 고장으로 업데이트 
+ 3. 화면에 고장락카 표시(선택 못하게 예외처리)
+
+- 고장해제 시 
+ 1.히스토리 업데이트(종료일자/요청자/비고 업데이트)
+ 2. 락카정보등록 페이지 사용가능으로 업데이트 
+
+* 고장락카 
+완료 - 셀렉트
+- 인서트: 현재일자 이후로 등록 안되게 입력
+ ※ 사용중 락카 인서트X, 락카 마스터 고장 상태 처리
+- delete업데이트
+- 메인 셀렉트 고장락카 
+
+
+- 메인 인서트 유효성 검사
+- 고정락카 인서트 고장 유효성 검사
+
+
+
+,GET_EMP_NAME(A.CORP_CODE, A.INS_EMP_NO) INS_EMP_NAME
+ ,GET_EMP_NAME(A.CORP_CODE, A.UPD_EMP_NO) UPD_EMP_NAME
+
+완료 - 신규버튼 초기화 하기 
+완료 - 고장등록 시 사용중인 락카 등록안되게 
+완료 - 고장등록 시 고장상태 락카 등록 안되게
+완료 - 수리완료 시 수리완료 상태인 경우 안되게 하기
+완료 - 락카 등록 시 고장상태 등록안되게
+완료 - 고정락카 등록시 고장상태 등록
+완료 - 셀렉트 그리드 고장상태 표출 
+완료 - 삭제후 바인드 색 유지
+완료 -고장상태 선택안되게
+
+그리드 정렬
+히든처리 
+
+
+완료 - 1. 패키지 지우기
+완료 - 2. 카운트 쿼리
+완료 - 3. 버튼색상
+완료 - 4. 복사기능 selCompanion 처리
+완료 - 5. 히든처리
+완료 - 고장락카 동일기간 내 등록안되게 해야함
+완료 - 고정, 고장락카 안내문구 표시
+6. ... 처리

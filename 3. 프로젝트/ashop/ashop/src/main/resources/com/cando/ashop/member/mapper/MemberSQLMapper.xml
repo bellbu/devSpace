@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cando.ashop.member.mapper.MemberSQLMapper">
+	<insert id="joinMember">
+		INSERT INTO FP_Member VALUES(
+			FP_Member_seq.nextval,
+			#{member_id},
+			#{member_pw},
+			#{member_nick},
+			#{member_gender},
+			#{member_birth},
+			#{member_phone},
+			#{member_email},
+			SYSDATE
+		)
+	</insert>
+
+	<!-- 주의 사항 : 1. 맨뒤에 ; 빼야된다.. 2.select 경우.. resultType 작성하자 -->
+
+	<select id="getMemberByIdAndPw" resultType="com.cando.ashop.vo.MemberVo">
+		SELECT * 
+		FROM FP_Member
+		WHERE member_id = #{member_id} 
+		AND member_pw = #{member_pw}	
+	</select>
+
+	<select id="getMemberByNo" resultType="com.cando.ashop.vo.MemberVo">
+		SELECT * FROM FP_MEMBER WHERE member_no = #{no}
+	</select>
+
+</mapper>
