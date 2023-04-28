@@ -1129,4 +1129,39 @@ PKG_SpaLockerSalesRegistration.SP_SELECT2 추가
 완료 - 5. 히든처리
 완료 - 고장락카 동일기간 내 등록안되게 해야함
 완료 - 고정, 고장락카 안내문구 표시
-6. ... 처리
+
+==========================================================
+
+내부프로젝트
+ 메인 메뉴클릭(메뉴이름, 설명, 가격) => 상세 메뉴화면 옵션 체크 담기 => 메인 메뉴 주문내역에 담김(메뉴이름, 옵션, 수량, 가격)
+
+* 테이블
+1. 메뉴옵션조회
+ 1) MENU_MASTER(품목코드): PK - CORP_CODE(법인코드), MENU_CODE(품목코드)
+ - 메뉴명, 이미지파일, 메뉴설명
+  
+ 2) UPJANG_MENU(영업장_메뉴_코드): PK - CORP_CODE(법인코드), MENU_CODE(품목코드)
+ - 메뉴명
+ 
+ 3) UPJANG_PACKAGE_MENU(패키지 메뉴 등록)
+ 4) UPJANG_MENU_PRICE(업장별 시즌 금액 정보)
+ 
+ 5) MENU_OPTION (옵션 상품 그룹관리): PK - CORP_CODE(법인코드), UPJANG_CODE(영업장코드), MENU_CODE(메뉴코드), GROUP_CDE(옵션 그룹 코드)
+ - 옵션 그룹
+
+ 6) MENU_OPTION_DETAIL(옵션 상품 그룹별 메뉴 관리): PK - CORP_CODE(법인코드), UPJANG_CODE(영업장코드), MENU_CODE(메뉴코드), GROUP_CDE(옵션 그룹 코드), OPTION_MENU_CODE(옵션 메뉴 코드)
+  - 각 옵션 판매금액
+  - 최대수량
+
+ 7) OPTION_MASTER(옵션 마스터): PK - CORP_CODE(법인코드), GROUP_CODE(옵션그룹코드)
+  - 옵션 그룹
+ 
+ 8) OPTION_DETAIL(옵션 디테일): PK - CORP_CODE(법인코드), GROUP_CODE(옵션그룹코드), OPTION_CODE(옵션코드), OPTION_NAME(옵션명)
+ - 옵션명
+
+
+1. 상세메뉴 셀렉트
+
+2. 주문 인서트
+태블릿, 모바일 - 주문
+모바일 - 카트 주문
