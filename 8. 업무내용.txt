@@ -1329,22 +1329,4 @@ PKG_HouseRepairRequestReq.SP_UPDATE -- 접수상태 유효성 검사 주석처�
 - 옵션 여러개 나올 경우 스크롤 화면 화살표 표출
 - API 정리
 
-
-
-		@PostMapping("/OrderInsert")
-	    public void MenuDetailAdd(HttpServletRequest request, @RequestBody HashMap<String, Object> param) throws Exception {
-			System.out.println("param>>."+param);
-			JSONObject jsonObj = new JSONObject();
-			HashMap<String, Object> result = new HashMap<String, Object>();
-			result = kjbService.OrderInsert(param);
-			
-			jsonObj.put("result", result.get("O_RESULT"));
-			jsonObj.put("msg", result.get("O_MSG"));
-	        
-			//response.setContentType("application/json; charset=UTF-8");
-			//PrintWriter out = response.getWriter();
-			//out.print(jsonObj);
-			//out.flush();
-			//out.close();
-			
-	    }
+ORDER_SEQ
