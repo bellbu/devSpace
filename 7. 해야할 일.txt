@@ -137,6 +137,7 @@ ORDER BY MONTH, CAR_ID DESC
 38) [Error] Compilation (13: 15): PLS-00323: subprogram or cursor 'SP_SELECT' is declared in a package specification and must be defined in the package body 
 - 패키지 바디 헤드 싱크 안맞음 생긴 오류
 39) 포스트맨 사용법 강의
+40) for of문 for in문 for문 차이
 ===================================================
 
 3월 계획
