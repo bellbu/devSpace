@@ -1385,3 +1385,145 @@ taxYn : UPJANG_MENU 테이블 TAX_YN
 메뉴그룹코드: 안주(0001) - 카테고리코드: 탕(1), 마른안주(2) / 음료주류(0002) - 음료(1), 주류(2)
 
 
+================================================================================================
+
+PMS 내부프로젝트 
+* 메뉴 등록
+- 테이블 : MENU_MASTER
+- PK : CORP_CODE
+      ,MENU_CODE
+- NOT NULL : CORP_CODE
+            ,MENU_CODE
+            ,MENU_NAME
+            ,TRUST_YN (기본값 'N')
+            ,USE_YN (기본값 'Y')
+            ,INS_DATE (기본값 'SYSDATE')
+- INSERT COLUMN :  CORP_CODE
+                  ,MENU_CODE
+                  ,MENU_NAME
+                  --MENU_L_CLASS 대분류  ???
+                  --MENU_M_CLASS 중분류  ???  
+                  --MENU_S_CLASS 소분류  ???
+                  ,TRUST_YN 수탁여부 (기본값 'N')
+                  --,BARCODE
+                  ,USE_YN (기본값 'Y')
+                  --,PACKAGE_YN 복합여부 (기본값 'N') 
+                  --,MENU_GUBUN  ???
+                  ,REMARK
+                  ,IMAGE_PATH
+                  ,MENU_INFO
+                  ,INS_EMP_NO
+                  ,INS_DATE (기본값 'SYSDATE')
+                  ,INS_IP
+
+
+* 영업장 메뉴 관리
+- 1) 테이블1 : UPJANG_MENU (업장코드, 메뉴코드 존재)
+- PK : CORP_CODE
+      ,UPJANG_CODE
+      ,MENU_CODE
+-NOT NULL :  CORP_CODE
+            ,UPJANG_CODE
+            ,MENU_CODE
+            ,USE_YN (기본값 'Y')
+            ,OPEN_YN 가격오픈여부 (기본값 'N')
+            ,DISPLAY_STTIME 화면표시 시작시간('0000')
+            ,DISPLAY_EDTIME 화면표시 종료시간('2359')
+            ,TAX_YN (기본값 'Y')
+            ,DC_YN (기본값 'Y')
+            ,BASE_PERSON 기준인원 (기본값 1)
+            ,FORECAST_YN 포케스트 사용여부 (기본값 'N') ???
+            ,RATE_GUBUN_YN 월력별요금설정여부 (기본값 'N')
+            ,KITCHEN_PRT_YN 주방출력여부 (기본값 'N')
+            ,OPTION_YN 옵션여부 (기본값 'N')
+            ,NOTE_ISSUING_YN 발권여부 (기본값 'N')
+            ,INS_DATE
+- INSERT COLUMN :  CORP_CODE   
+                  ,UPJANG_CODE
+                  ,MENU_CODE 
+                  ,USE_YN
+                  ,OPEN_YN
+                  ,MENU_NAME ?? 메뉴 마스터에도 존재
+                  --,MENU_ABBR_NAME 메뉴 단축명??
+                  ,DISPLAY_STTIME
+                  ,DISPLAY_EDTIME
+                  ,TAX_YN
+                  ,DC_YN
+                  --,ADULT_ID 대소인 구분
+                  ,BASE_PERSON 기준인원
+                  --,SEX_ID 성별구분
+                  --,TRUST_TYPE_CODE 위탁,수탁 
+                  ,FORECAST_YN 포케스트 사용여부 ??
+                  --,MENU_TYPE 메뉴타입
+                  ,RATE_GUBUN_YN 월력별요금설정여부
+                  ,KITCHEN_PRT_YN 주방출력여부
+                  --,KITCHEN_PRT_IP 주방프린터 IP
+                  ,OPTION_YN
+                  ,NOTE_ISSUING_YN 발권여부
+                  --,AUTO_LOCKER_YN 자동락카 불출여부
+                  --,TICKET_PRINT_TYPE 발권유형(띠지,영수증)(BS064). 티켓 출력유형
+                  ,INS_EMP_NO
+                  ,INS_DATE
+                  ,INS_IP
+
+- 2) 테이블2 : UPJANG_MENU_PRICE
+- PK:  CORP_CODE
+      ,UPJANG_CODE
+      ,MENU_CODE
+      ,SEASON_CODE 시즌구분
+      ,DAY_TYPE_CODE 주중주말
+- NOT NULL : CORP_CODE
+            ,UPJANG_CODE
+            ,MENU_CODE
+            ,SEASON_CODE 시즌구분 (기본값 000)
+            ,DAY_TYPE_CODE 주중주말 (기본값 000)
+            ,SALE_PRICE (기본값 0)
+            ,INS_DATE (기본값 SYSDATE)
+- INSERT COLUMN :  CORP_CODE
+                  ,UPJANG_CODE
+                  ,MENU_CODE
+                  ,SEASON_CODE 시즌구분 (기본값 000)
+                  ,DAY_TYPE_CODE 주중주말 (기본값 000)
+                  ,SALE_PRICE (기본값 0)
+                  ,INS_EMP_NO
+                  ,INS_DATE (기본값 SYSDATE)
+                  ,INS_IP
+
+
+* 모바일 메뉴 관리
+- 테이블 : MOBILE_MENU(업장코드, 메뉴그룹코드, 카테고리 코드, 메뉴코드 존재)
+- PK :   CORP_CODE, 
+        ,UPJANG_CODE
+        ,MENU_GROUP_CODE 
+        ,CATEGORY_CODE
+        ,MENU_CODE
+- NOT NULL : CORP_CODE
+            ,UPJANG_CODE
+            ,MENU_GROUP_CODE 
+            ,CATEGORY_CODE
+            ,MENU_CODE
+            ,USE_YN (기본값 'Y')
+            ,SOLD_YN (기본값 'N')
+            ,SEQ (기본값 '1')
+            ,INS_DATE
+- INSERT COLUMN :  CORP_CODE
+                  ,UPJANG_CODE
+                  ,MENU_GROUP_CODE 
+                  ,CATEGORY_CODE
+                  ,MENU_CODE
+                  ,USE_YN
+                  ,SOLD_YN 품절여부
+                  ,SEQ 정렬순서
+                  ,INS_EMP_NO
+                  ,INS_DATE
+                  ,INS_IP
+
+
+
+중복 인서트, 업데이트 검사
+
+
+
+
+
+
