@@ -1545,8 +1545,6 @@ PMS 내부프로젝트
 
 data:image/png;base64,
 
-<<<<<<< HEAD
 테스트2
-=======
+
 테스트1
->>>>>>> origin/develop
