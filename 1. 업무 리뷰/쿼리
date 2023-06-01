@@ -505,6 +505,24 @@ SELECT EXTRACT(MONTH FROM 날짜칼럼) --월
 FROM DUAL;
 
 
+구구단 꿀팁
+
+DECLARE
+    I NUMBER := 2;
+    J NUMBER := 1;
+BEGIN
+    LOOP
+        LOOP
+            DBMS_OUTPUT.PUT_LINE(I || ' * ' || J || ' = ' || I*J);
+            J := J + 1;
+            EXIT WHEN J = 10;
+        END LOOP;
+        I := I + 1;
+        J := 1;
+        DBMS_OUTPUT.PUT_LINE('=========================');
+        EXIT WHEN I = 10;
+    END LOOP;
+END;
 
 
 

@@ -295,6 +295,8 @@ Servlet은 HttpServletResponse객체에 Content Type, 응답코드, 응답 메�
 
 * $(document).ready()와 $(window).load() 차이점 
  1) $(document).ready()
+  - 축약형: $(function(){})  
+  - 페이지 로딩이 끝났을 때 실행될 함수를 등록하는 곳
   - DOM 트리만 완성되면 바로 실행
   - window.load() 보다 더 빠르게 실행
   - 중복 사용 가능

@@ -41,7 +41,9 @@
 .next(), 아무 타입으로 반환할 수 있습니다. Iterator에 입력된 값들이 String이면 String 값으로 가져오는 것입니다. 
 .hasNext() boolean 타입으로 반환. 즉 "True or False"로 반환 
 23) 자바스크립트 for문 while문 별찍기
+
 26) 일반 세이브/그리드 세이브 서비스단 비교 
+
     (1) 그리드 세이브
 	@Transactional 
 	public HashMap<String, Object> KjbGridCrud_Control(HttpServletRequest request) throws Exception {
@@ -128,12 +130,16 @@ HAVING COUNT(CAR_ID) != 0
 ORDER BY MONTH, CAR_ID DESC
 
 31) WITH절과 VIEW테이블 차이??
-32) $(function () {} 와 $( document ).ready(function(){} 차이
-33) 포캐스팅 방식이라??
-34) iframe 태그란??
+34) <iframe> 태그
+- Inline Frame 의 약자
+- 웹 브라우저 내에 또 다른 프레임, 즉 현재 브라우저에 렌더링되고 있는 문서 안에 또 다른 HTML페이지를 삽입할 수 있도록 하는 기능을 제공
+- 현재는 HTML5 표준에서 이런 기능을 기본적으로 지원하고 있기 때문에 많이 사용되고 있지는 않음
+- HTML5 표준을 공식적으로 지원하고 있지 않은 브라우저들에서는 여전히 iframe이 사용
+
+
+
 35) iframe, parent, webkit 공부
 36) 스프링 주석기능
-37) API 개념
 38) [Error] Compilation (13: 15): PLS-00323: subprogram or cursor 'SP_SELECT' is declared in a package specification and must be defined in the package body 
 - 패키지 바디 헤드 싱크 안맞음 생긴 오류
 39) 포스트맨 사용법 강의
@@ -153,7 +159,6 @@ ORDER BY MONTH, CAR_ID DESC
 - 4강 다시 듣기
 
 
-잘하자!! 테스트
 
 
 
