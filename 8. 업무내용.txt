@@ -1576,3 +1576,23 @@ BSB02M(UPJANG_MENU) A, BSG01M(UPJANG_INFO) G01, POA02S(MENU_MASTER)   BSB02D(UPJ
 유효성 검사
 
 =================================
+
+* 뮤지엄김치간 
+VPN
+https://ssl2.pulmuone.com/
+ID : userve05  / PW : sslvpn!@34
+
+FTP
+홈페이지 서버1 : 211.233.54.38
+홈페이지 서버2 : 211.233.54.39
+ID : root  / PW : Rnfwoa!!038 , Rnfwoa!!039  ( 뒤 3자리 숫자는 각 서버별 IP 뒷자리 )
+
+DB(REAL) - mysql
+192.1.5.21:3306
+database : kimchikan
+ID : root / PW : Rlacl0619)^!(
+
+DB(DEV)
+192.168.31.214:3306
+database : kimchikan
+id : root / PW : Userve0822!
