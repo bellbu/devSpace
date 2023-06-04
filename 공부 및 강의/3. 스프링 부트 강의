@@ -1,8 +1,48 @@
-홍팍
-* 3강 개발환경 만들기
+* 메타코딩(6강/73강)
+1. 3강 의존성 설정 
+ 1) New Spring Starter Project Dependencies 체크사항
+    - Spring Boot DevTools
+    - Lombok
+    - Spring Data JPA
+    - MySql Driver
+    - Spring Security
+    - Spring Web
+
+ 2) pom.xml 의존성 추가
+    <!-- 추가 라이브러리 시작 -->
+    <!-- 시큐리티 태그 라이브러리 -->
+    <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-taglibs</artifactId>
+    </dependency>
+
+    <!-- JSP 템플릿 엔진 -->
+    <dependency>
+        <groupId>org.apache.tomcat.embed</groupId>
+        <artifactId>tomcat-embed-jasper</artifactId>
+    </dependency>
+
+    <!-- JSTL -->
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.2</version>
+    </dependency>
+    <!-- 추가 라이브러리 종료 -->
+
+2. 6강 MySQL 프로젝트 연결
+ 1) application.yml 설정
+    spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/blog?serverTimezone=Asia/Seoul
+        username: cos
+        password: cos1234
+
+===============================================================================
+
+* 홍팍(3강/32강)
+1) 3강 개발환경 만들기
 - 스프링 부트 개발환경 준비과정
 JDK: 자바코드의 번역과 실행을 담당하는 자바개발 도구
 IDE: 개발 생산성을 높여주는 도구들 ex) 이클립스, 인텔리제이
-
-3강 10분 20초까지 들었음
-

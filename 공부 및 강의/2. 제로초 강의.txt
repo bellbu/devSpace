@@ -71,20 +71,3 @@ const c = () => {};       // 화살표 함수(세미콜론 붙임)
 2. 오라클 3단계 문제풀이 (완료)
 
 
-
-
-
-	/**
-	 * 온천락카판매등록 - 키주소 조회
-	 * @param request
-	 * @param response
-	 * @throws Exception
-	 */
-	public List<?> SpaLockerSalesRegistration_KeyAddress_Select(HashMap<String, Object> param) throws Exception {
-		return btmSpaMapper.SpaLockerSalesRegistration_KeyAddress_Select(param);
-	}
-
-
-   public List<?> SpaLockerSalesRegistration_KeyAddress_Select(HashMap<String, Object> param)  throws Exception  {
-		return btmSpa.selectList("SpaLockerSalesRegistration.Key_Address_Select",param);
-	}
