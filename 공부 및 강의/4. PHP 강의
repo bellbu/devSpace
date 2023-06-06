@@ -1,0 +1,37 @@
+생활코딩 WEB2-PHP
+23강/42강
+
+10강 연산자
+
+<?php
+    echo 1+1;
+?>
+
+11강 문자열
+1)
+<?php
+    echo "Hello world";
+    echo 'Hello world';
+    echo "Hello "."world";
+?>
+
+2) 문자열 길이
+<?php
+    echo strlen("Hello world");
+?>
+
+12강 변수
+<?php
+    $a = 10;
+    echo $a+1;  // 11
+?>
+
+<?php
+    $name = "leezche";
+    echo "Lorem ipsum dolor sit ame, consectetur".$name." adipiscing elit"
+?>
+
+13강 파라미터 (url로 넘거온 name의 값)
+<body>
+    안녕하세요. <?php echo $_GET['name']; ?>님
+</body>
