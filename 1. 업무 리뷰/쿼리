@@ -505,8 +505,7 @@ SELECT EXTRACT(MONTH FROM 날짜칼럼) --월
 FROM DUAL;
 
 
-구구단 꿀팁
-
+--35) 구구단 꿀팁
 DECLARE
     I NUMBER := 2;
     J NUMBER := 1;
@@ -525,7 +524,17 @@ BEGIN
 END;
 
 
+--36) WITH절과 VIEW테이블 차이??
+- WITH절은 Oracle 9 이후 버전부터 사용 가능 
+- WITH절과 인라인 뷰(서브쿼리)를 한 번만 사용할 경우 성능차이는 없음
+- WITH 절에 정의된 쿼리는 여러번 사용할수록 효율이 증가
 
+[예문]
+WITH DINNER_MENU AS (
+  SELECT '삼겹살' AS 오늘저녁메뉴 FROM dual
+)
 
+SELECT * FROM DINNER_MENU;
 
+--37) INTERSECT
 

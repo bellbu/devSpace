@@ -1,0 +1,77 @@
+전투력 파악
+* 원그리드
+- controller, service, mapper
+- 받아온 데이터 뿌려주기
+- 조건절 파악하는 지
+
+* 원그리드 CRUD
+
+
+
+
+메이드 정보(RBD05M)
+- CORP_CODE	        법인코드(not null) - pk
+- MAID_NO	        메이드코드(not null) - pk
+- MAID_NAME	        메이드성명
+- IPSA_DATE	        입사일자
+- HP_NO	            핸드폰번호
+- EMP_YN	        사용유무
+- LEVEL_DIV	        등급구분(RB010)
+- REMARKS	        참고사항
+- INS_EMP_NO	    등록자
+- INS_DATE	        등록일자
+- INS_IP	        등록IP
+- UPD_EMP_NO	    수정자
+- UPD_DATE	        수정일자
+- UPD_IP	        최종 수정자 IP
+- PASSWORD_CODE	
+- GROUP_CODE	    정비원그룹코드
+- LOGIN_FAIL_CNT	
+
+객실정비정보(RBD04H) 
+- MTC_NO	    순번(not null) - pk
+- ROOM_NO	    객실번호(not null) - pk
+- CORP_CODE	    법인코드(not null) - pk
+- UPJANG_CODE	업장코드(not null) - pk
+- WORK_DATE	    영업일자(not null) - pk
+- MAID_NO	    메이드번호(not null) - pk
+- CLEAN_STAT	객실상태(RB005)
+- ST_TIME	    시작시간[HH24MI]
+- ED_TIME	    종료시간[HH24MI]
+- REMARKS	    참고사항
+- INS_EMP_NO	등록자
+- INS_DATE	    등록일자
+- INS_IP	    등록IP
+- UPD_EMP_NO	수정자
+- UPD_DATE	    수정일자
+- UPD_IP	    수정IP
+- SISUL_CHK	    객실시설체크완료여부
+- BIPUM_CHK	    객실비품체크완료여부
+
+객실정보(RBD02D)
+- CORP_CODE	    법인코드 - pk
+- UPJANG_CODE	업장코드 - pk
+- ROOM_NO	    객실번호 - pk
+
+신인과제
+1. 원그리드 조회화면 - 메이드 정보(RBD05M)
+2. 투그리드 바인드(조인) - 메이드 정보(RBD05M), 객실정비정보(RBD04H) 
+3. 원그리드 CRUD (+ 팝업화면) - RBD04H(객실정비 정보) (+팝업 RBD02D(객실정보))
+
+
+
+1. 신입과제 계획표 작성
+
+* 알아두면 좋은 팁들 정리
+1. 오라클 패키지와 프로시져 
+2. INNER JOIN, LEFT OUTER JOIN 차이 
+3. 제이쿼리 CSS 선택자 
+4. 제이쿼리 자주 쓰이는 함수
+5. ajax 개념
+6. json 개념
+7. jsp EL(Expression Language) 문법 
+8. document.ready(fucntion(){}); 의미
+9. 핀크스 저장방식(grid Save, form Save)
+10. TOAST GRID 옵션 이벤트 참고만 (링크: http://1004lucifer.blogspot.com/2019/04/jqgrid_85.html)
+
+

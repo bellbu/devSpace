@@ -93,7 +93,7 @@
 
 	}
 
-
+29) 소스트리 깃 플로우 공부
 30) 프로그래머스 쿼리 파악하기
 WITH FILTER AS ( -- 8~10월의 최소 1개 이상인 자동차 아이디만 가져오는 것
     SELECT CAR_ID
@@ -130,26 +130,24 @@ HAVING COUNT(CAR_ID) != 0
 ORDER BY MONTH, CAR_ID DESC
 
 31) WITH절과 VIEW테이블 차이??
+
+35) webkit 공부
 36) 스프링 주석기능
+38) [Error] Compilation (13: 15): PLS-00323: subprogram or cursor 'SP_SELECT' is declared in a package specification and must be defined in the package body 
+- 패키지 바디 헤드 싱크 안맞음 생긴 오류
+39) 포스트맨 사용법 강의
 40) for of문 for in문 for문 차이
 41) for문 continue, break 확인
 ===================================================
 
-6월 계획
-* 강의
-스프링 강의 : 홍팍, 메타코딩 
-자바스크립트 강의(제로초:119강)
-PHP 언어 공부
-APM 강의 듣기
- 
-* 공부
-프로그래머스 SQL 퀴즈 매일 1문제
-정보처리기사 실기 매일 1시간
+3월 계획
+완료 - 스프링부트 개념정리(인프런)
+완료 - 정보처리기사 필기
 
-
-for(var prop in obj) {
-	console.log(prop, obj[prop])
-}
-
-
-
+자바스크립트 강의2강 (제로초:28강/119강),
+스프링 환경설정 강의 홍팍 3강, 메타코딩 8강 까지
+스프링 강의 홍팍 or 메타코딩 
+쿼리 퀴즈 1문제
+소스트리 강의 4강 완료
+- 4강 다시 듣기
+=====================================

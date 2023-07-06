@@ -1719,3 +1719,439 @@ partials 폴더 상세 설정
 아작스 include
 
 한달에 한번, 두 달에 한번 옴.
+
+=======================================================
+
+WD-576 비오토피아 이름 검색 팝업
+
+고객, 내장객, 법인pkg - 검색(멤버사, 주택정보, 동명이인 리스트 표시)
+
+이용자 명 검색 시 현재 고객검색. 내장객 검색 기능, 법인PKG, 고객 (ex. Pos 내장객&객실, 법인PKG, 고객 별 검색)
+현재 이용자 검색은 고객 번호만 검색 되고있음
+현재 내장중인 고객 을 검색하여 - 비회원일 지라도 해당 주택기준의 멤버사 등을 연동하면 좋을 것 같음
+
+1.이용자 성명 검색 시 해당 주택 정보 불러오기
+(맴버사 – 요청 멤버사 1순위로 불러오고 요청 멤버사가 일반주택으로 되어 있을 경우 소유 멤버사로 불러오기,
+동명이인이 있을 경우 리스트 표시 必)
+
+
+
+-------------------------------------------------------------
+
+작업완료 - order by
+
+작업완료 - 숫자 표기
+
+작업완료 - 바인드
+
+완료 - 1) 비오토피아 바인드
+ 		BindData = [
+ 			{ grid : 'memName',			view : 'guestName',			type :'text'},
+ 			{ grid : 'guestNo',			view : 'guestNo',			type :'text'},
+ 			{ grid : 'roomNo',			view : 'roomNo',			type :'text'},
+ 			{ grid : 'relativeType',	view : 'relativeType',		type :'select2'},
+ 			{ grid : 'memType',			view : 'memType',			type :'select2'},
+ 		];
+
+   2) 이외 바인드
+ 		BindData = [
+ 			 { grid : 'memName',		view : 'guestName',			type :'text'}
+ 			,{ grid : 'guestNo',		view : 'guestNo',			type :'text'}
+ 			,{ grid : 'memType',		view : 'memType',			type :'select2'}
+ 		];
+ 	
+완료 - 3) 투숙객 중에 비오토피아 인경우 멤버사 바인드 추가
+
+
+완료  - * 투숙객 온천요금 쿠폰 바인드
+
+완료  - * 그리드 정렬
+  * 이름 필수입력 후 검색
+  * 비토인 경우 입주자 managemnet_type 멤버사(11) 인경우 멤버사, 일반(00)인 경우
+
+※ 패키지 생성
+USERVE.PKG_RETRIEVEGUESTINFOPOP
+
+
+※ 확인사항
+1. 모든 탭 뷰의 고객번호 바인드 될 때 회원번호(memNo) 아닌 고객번호(guestNo)로 바인드 시킴
+2. 투숙객 온천요금은 RBA01M.BITO_SPA_TYPE 따라서 바인드
+
+ ========================================================
+
+완료 - 1. 아이디 만들기
+2. 신입교육 예제 만들기
+3. 화면 계산만들기
+
+* 온천락카
+
+내장객(골프) : 비토 온천 사용권한 없음으로 내장객에서 고객선택 시 입장객구분 연동은 업무담당자가 판단 할 수 있도록”--선택--”
+
+투숙객 : 투숙하고있는 주택 번호 확인
+
+주택 = 멤버사 주택
+→ 투숙객 이 해당 주택에 등록된 본인/가족/지정인/그 외(게스트, 주택에 등록안된사람) 구분에 따라 코드 연동
+
+주택 = 일반주택
+→ 투숙객 이 해당 주택에 등록된 본인/가족/지정인/그 외(게스트, 주택에 등록안된사람) 구분에 따라 코드 연동
+
+
+* 온천락카 고객구분 연동 작업 
+
+
+- 투숙객 : 1) 비토(투숙 주택 번호 확인) => 멤버사 => 본인/가족/지정인/그외(게스트, 주택에 등록안 된 사람)
+                                      => 일반 => 본인/가족/지정인/그외(게스트, 주택에 등록안 된 사람)
+          
+RELATION 따라서 바인드
+
+- 비토입주자 :  멤버사 주택 => 본인/가족/지정인  
+               일반 주택   => 본인/가족/지정인
+
+
+RELATION 
+공통코드(CR008) : 본인(001), 가족(002), 지정인(003)
+
+========================================
+김치간 알림톡 전송 DB작업
+wp_template
+earlyVisitGuideSms
+==============================================
+원마운트 개발소스 배포방법(젠킨스 가이드)
+
+원마운트 AS-IS 프로젝트 소스는 해당 디렉토리 OMIS.zip 가져오시면됩니다.
+
+★원마운트 작업 공유사항★
+아래 내용 참고해서 작업 하실 때 규격 맞춰주시길 바랍니다.
+  1. 화면작업은 AS-IS 참고하여 적용할 것.
+   ※ 단 편의성 및 개선가능 한 부분은 협의하에 변경 가능 함.
+  2. SQL 프로시저 → 패키지로 변경
+     2-1. 패키지명칭은 "PKG_화면명칭" 으로 통일
+  3. 화면명칭은 화면 구성에 따라 적용.
+    ※ 명칭은 카멜케이스 적용
+     3-1. 단순 조회 화면
+        ex) retrieveUpjangForm.jsp
+     3-2.데이터 관리 화면
+        ex) saveUpjangForm.jsp
+     3-3.팝업 화면
+        ex) popSaveUpjangForm.jsp
+   4. 그리드 정렬 규칙
+      4-1. 숫자,금액 필드는 오른쪽 정렬
+      4-2.  코드, 일정한 길이의 텍스트는 중앙 정렬
+      4-3. 그 외 텍스트는 좌측 정렬
+   5. 버튼 색상 규칙
+      5-1. 신규 - 파란색 (btn info)
+      5-2. 저장 - 초록색 (btn success)
+      5-3. 삭제 - 빨간색 (btn danger)
+      5-4. 엑셀 및 기타 추가 기능 - 검은색 (btn dark)
+
+AS-IS 화면은 나스에 있습니다.  준환씨가 작업중
+경로 : \\192.168.31.250\U_Project\[01.045] (주)원마운트\33. 원마운트 통합 시스템 재구축\01. 화면 정리\원마운트AS-IS화면
+
+화면작업이 완료되면 체크리스트 점검해서 점검 결과 나스에 올려주세요.
+\\192.168.31.250\U_Project\[01.045] (주)원마운트\33. 원마운트 통합 시스템 재구축\01. 화면 정리\화면체크리스트
+
+작업DB정보
+ ⦁ HOST : 192.168.31.214
+ ⦁ PORT : 1521
+ ⦁ SID   : PMSPINX
+ ⦁ USER : OMIS
+ ⦁ PW   : userve0822
+원마운트DEV DB정보
+ ⦁ HOST : 222.101.113.14
+ ⦁ PORT : 1521
+ ⦁ SID   : OMISDEV
+ ⦁ USER : ONEMAPP
+ ⦁ PW   : ONEMAPP00
+원마운트REAL DB정보
+ ⦁ HOST : 222.101.113.21
+ ⦁ PORT : 1521
+ ⦁ SID   : OMISREAL
+ ⦁ USER : ONEMAPP
+ ⦁ PW   : ONEMAPP00
+
+1. 화면 UI 구성 AS-IS COPY ? 개선
+2. 각 동작 프로시저,SQL 패키지화
+3. PKG_화면명...
+ 화면명
+      조회 : Retrive ~~~
+    관리 : Save ~~~~
+    패키지 : PKG_Retrive ~~~
+4. 그리드
+      숫자 : RIGHT 오른쪽 정렬
+      코드성,길이 일정한 텍스트 : 중앙 정렬
+      일반텍스트 : LEFT 왼쪽 정렬
+   버튼 배치
+     [신규 : 파란색] / [저장 : 초록색] / [삭제 : 빨간색] / [엑셀OR추가기능 : 검은색]
+
+추가적으로 WBS 내일 오전중으로 수정좀 부탁드려요.
+작업자별로 일정생각해서(하계휴가, 병행업무 등 고려)
+조회성화면은 맨 마지막에 일정잡고,
+목표 end는 8/11일
+===================================================================
+
+1. 신입교육
+완료 - 설계 잘못 될 수 있으므로 의문사항 있으면 질문
+완료 - 26일 휴가
+- appnend, appendTo 차이
+
+2. 핀크스
+완료 - 매니저님 연락 오면 입장객 구분 반영
+
+3. 웰리힐리
+- 코드파악, 쿼리 수정
+
+4. 뮤지엄김치간
+- wp-admin 접속 가능하게 해야 함
+- 코드 파악 
+
+5. 원마운트(8월 11일 까지)
+- 캡쳐화면 바탕으로 UI 구성 (개선사항 생기면 질문)
+- 각 동작 XML 프로시저로 호출, SQL 패키지화 (쿼리들 패키지화 - 화면당 패키지) EX) 통합회원(대분류) => 중분류(7개 컨트롤러 필요*)
+- DEVELOP에서 진행, 데일리 단위로 커밋
+- 단체 AS IS 분석
+- 관리화면 최우선적으로
+- NAS 화면 정리
+- 화면 작업 완료되면 체크리스트 체크
+
+★원마운트 작업 공유사항★
+아래 내용 참고해서 작업 하실 때 규격 맞춰주시길 바랍니다.
+  1. 화면작업은 AS-IS 참고하여 적용할 것.
+   ※ 단 편의성 및 개선가능 한 부분은 협의하에 변경 가능 함.
+  2. SQL 프로시저 → 패키지로 변경
+     2-1. 패키지명칭은 "PKG_화면명칭" 으로 통일
+  3. 화면명칭은 화면 구성에 따라 적용.
+    ※ 명칭은 카멜케이스 적용
+     3-1. 단순 조회 화면
+        ex) retrieveUpjangForm.jsp
+     3-2.데이터 관리 화면
+        ex) saveUpjangForm.jsp
+     3-3.팝업 화면
+        ex) popSaveUpjangForm.jsp
+   4. 그리드 정렬 규칙
+      4-1. 숫자,금액 필드는 오른쪽 정렬
+      4-2. 코드, 일정한 길이의 텍스트는 중앙 정렬
+      4-3. 그 외 텍스트는 좌측 정렬
+   5. 버튼 색상 규칙
+      5-1. 신규 - 파란색 (btn info)
+      5-2. 저장 - 초록색 (btn success)
+      5-3. 삭제 - 빨간색 (btn danger)
+      5-4. 엑셀 및 기타 추가 기능 - 검음색 (btn dark)
+   6. 메뉴 화면 URL COB11D테이블의 URL 컬럼에 수동으로 입력하여 연결 
+
+
+DB파일용량이 너무 커서, 테이블만 덤프떠서 가져왔습니다. (데이터X)
+데이터 조작 및 패키지 생성은 아래 작업DB정보 HOST에서 진행해주시면 되고
+테스트 데이터나 프로시저는 아래 원마운트 DEV에 접속하셔서 확인해주시면 됩니다.
+
+작업DB정보
+ ⦁ HOST : 192.168.31.214
+ ⦁ PORT : 1521
+ ⦁ SID   : PMSPINX
+ ⦁ USER : OMIS
+ ⦁ PW   : userve0822
+
+원마운트DEV DB정보
+ ⦁ HOST : 222.101.113.14
+ ⦁ PORT : 1521
+ ⦁ SID   : OMISDEV
+ ⦁ USER : ONEMAPP
+ ⦁ PW   : ONEMAPP00
+
+원마운트REAL DB정보
+ ⦁ HOST : 222.101.113.21
+ ⦁ PORT : 1521
+ ⦁ SID   : OMISREAL
+ ⦁ USER : ONEMAPP
+ ⦁ PW   : ONEMAPP00
+
+
+ --------------------------------
+
+ 원마운트 할 일
+ 1. 원마운트 화면 소스 파악
+ 2. 
+ 3. 화면명 만들기
+
+
+* 상품관리(crItem)	
+ - 상품등록	/cr/cr101/CR10101.do
+ - 상품가입등록	/cr/cr101/CR10102.do
+ - 가입지금품 등록 /cr/cr101/CR10103.do
+ - 판촉원등록	/am/am102/AM10201.do
+
+* 입금관리
+ - 입금등록	/cr/cr102/CR10201.do
+	
+* 현황관리
+ - 상품구분별판매현황 /cr/cr101/CR10108.do
+ - 기간별상품판매현황 /cr/cr101/CR10109.do
+ - 입금현황	/cr/cr102/CR10203.do
+ 	         
+
+==================================================
+
+완료 - 1. 오전 신입 피드백 체크
+완료 - 2. task 적용
+완료 - 4. 원마운트 wbs 적용
+완료 - 6. 핀크스 운영 개발 쿼리 확인
+5. 원마운트 페이지 만들기 
+완료 - 합계, 공급가, 부가세 합치기
+완료 - 패키지 옳은지 확인
+완료 - 검색조건 공통코드 확인
+완료 - 셀렉트 쿼리 만들기
+신규
+저장
+수정
+삭제
+복사
+==============================================
+
+
+
+완료 - CR058A=ds_sItemDiv,
+완료 - CR054A=ds_sIndCorp,
+완료 - CR059A=ds_sPayInstDiv, 
+CR058N=ds_itemDiv, 
+CR053N=ds_Supplies, 
+CR003N=ds_guestType, 
+BS013N=ds_dcTypeCode, 
+CR060N=ds_mdPayDiv, 
+CR054N=ds_indCorp, 
+CR059N=ds_payInstDiv, 
+BS016N=ds_charge_div, 
+완료 - GF008A=ds_useYn, 
+완료 - CR075A=ds_largeLevel, 
+CR075N=ds_itemLargeLevel
+
+=========================
+
+원마운트 
+상품등록
+완료 - 화면 ui만들기
+완료 - f_GridBind 이벤트
+완료 - 각 그리드 신규 버튼
+- 저장 기능 만들기
+- 각 그리드 삭제 기능 만들기 
+- 복사 기능 만들기
+
+
+	}else if(vGridID == "gr_supp"){
+		vDataSet.AddRow();     
+		vRow = vDataSet.RowPosition;
+		vGrid.SetColumn(vGrid.GetColumnID(1));
+    
+		vDataSet.NameValue(vRow, "itemNo")       = ds_List.NameValue(ds_List.RowPosition, "itemNo");
+		vDataSet.NameValue(vRow, "suppliesType") = "002";
+		vDataSet.NameValue(vRow, "useYn")        = "Y";     
+
+	}else{
+		vDataSet.AddRow();
+		vGrid.SetColumn(vGrid.GetColumnID(0));  
+		vRow = vDataSet.RowPosition;
+
+		if(vGridID == "gr_item"){
+
+
+			vDataSet.NameValue(vRow, "itemNo")      = ds_List.NameValue(ds_List.RowPosition, "itemNo");
+			vDataSet.NameValue(vRow, "guestType")   = "011";  
+			vDataSet.NameValue(vRow, "dcTypeCode")  = "001";
+			vDataSet.NameValue(vRow, "useYn")       = "Y";     
+
+
+
+		}else if(vGridID == "gr_dpst"){
+			vDataSet.NameValue(vRow, "itemNo")      = ds_List.NameValue(ds_List.RowPosition, "itemNo");
+			vDataSet.NameValue(vRow, "ds_mdPayDiv") = "001"; 
+			vDataSet.NameValue(vRow, "useYn")       = "Y";		
+		}
+
+
+
+========================================
+김치간 알림톡 전송 DB작업
+관리자 페이지 - 아이디: userve, 비번: userve311!
+테이블 - wp_template
+프로시저 - earlyVisitGuideSms(3일전)
+프로시저 - earlyVisitGuideSms_day(당일) 
+스케줄 등록 PHP - html-admin-schedule-add
+취소 PHP - class-hamakimchi-ajaxs
+
+월력 예약팝업 테이블 - wp_posts 테이블에서 post_date 변경해주고 / publish / open으로 변경
+
+VPN
+https://ssl2.pulmuone.com/
+ID : userve05  / PW : sslvpn!@34
+==============================================
+
+
+작업완료 - 뮤지엄 김치간
+* sk 핀크스 : 이름 들어간 화면 리스트 작성 후 대소문자 조회
+* 원마운트
+1. 메인 
+완료 - 등록, 
+완료 - 수정, 
+완료 - 삭제 
+
+2. 서브그리드 
+등록, 수정, 삭제
+
+복사기능
+
+============================================
+
+
+sBookName 예약자명
+sGscName 방문객명
+sPakageType 패키지명
+
+완료 - gr_DateList
+완료 - gr_ReservList
+*checkReservPerformance.Detail_All_Select 패키지
+
+
+===============================================
+
+완료 - 씽크작업 
+핀크스 작업
+대국시 쿼리 
+OMIS 작업
+
+
+		// 지급품코드
+					 name: 'suppliesCode'
+					,align: "center"
+					,width: "auto"
+					,editable : true
+					,template:getStringTemplate(10,false)
+				},{
+					// 지급품명
+					name: 'suppliesName'
+					,align: "left"
+					,width: "auto"
+					,editable : true
+					,template:getStringTemplate(10,false)
+				},{
+					// 지급품구분
+					 name: 'suppliesType'
+					,align: "center"
+					,width: "auto"
+					,editable : true
+					,template : getSelectCommonCodeTemplate('CR053',false)
+				},{
+					// 수량
+					 name: 'qty'
+					,align: "right"
+					,width: "auto"
+					,editable : true
+					,template:getStringTemplate(10,false)
+				},{
+					// 사용여부
+					 name: 'useYn'
+					,align: 'center'
+					,width: 'auto'
+					,editable : true
+					,template:getSelectYnTemplate(false)
+				},{
+					//히든 상품번호
+					 name : 'itemNo'
+				 	,align: 'center'
