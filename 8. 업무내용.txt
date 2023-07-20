@@ -2109,49 +2109,92 @@ sPakageType 패키지명
 *checkReservPerformance.Detail_All_Select 패키지
 
 
-===============================================
-
-완료 - 씽크작업 
-핀크스 작업
-대국시 쿼리 
-OMIS 작업
+==========================================================
 
 
-		// 지급품코드
-					 name: 'suppliesCode'
-					,align: "center"
-					,width: "auto"
-					,editable : true
-					,template:getStringTemplate(10,false)
-				},{
-					// 지급품명
-					name: 'suppliesName'
-					,align: "left"
-					,width: "auto"
-					,editable : true
-					,template:getStringTemplate(10,false)
-				},{
-					// 지급품구분
-					 name: 'suppliesType'
-					,align: "center"
-					,width: "auto"
-					,editable : true
-					,template : getSelectCommonCodeTemplate('CR053',false)
-				},{
-					// 수량
-					 name: 'qty'
-					,align: "right"
-					,width: "auto"
-					,editable : true
-					,template:getStringTemplate(10,false)
-				},{
-					// 사용여부
-					 name: 'useYn'
-					,align: 'center'
-					,width: 'auto'
-					,editable : true
-					,template:getSelectYnTemplate(false)
-				},{
-					//히든 상품번호
-					 name : 'itemNo'
-				 	,align: 'center'
+OMIS 원격접속
+222.101.113.12
+administrator
+qwe!23
+
+아이디: 001234 
+비번: 432100
+
+===========================
+
+task에 직책변경
+뮤지엄김치간 - 예약오픈 후 예약데이터 정리
+원마운트 - WBS 업데이트, 사원휴가 관리
+
+=============================
+
+원마운트
+- 가입지급품등록 점검
+- 상품등록 페이지 수정
+- 판촉원 등록 신규작업
+
+
+ "CR003"=ds_guestType, 
+,"BS013"=ds_dcTypeCd, 
+,"CR004"=ds_job, 
+,"CR008"=ds_relation, 
+,"CR058"=ds_itemDiv, 
+,"CR059"=ds_payInstDiv, 
+,"CR054"=ds_indCorp, 
+,"BS016"=ds_charge_div, 
+,"CR060"=ds_mdPayDiv, 
+,"CR053"=ds_Supplies, 
+,"GF008"=ds_Yn, 
+,"CR057"=ds_lunarCode, 
+,"CR023"=ds_dmSendDiv, 
+,"CR055"=ds_sex)" />   
+
+=========================================================
+
+상품가입등록 
+완료 - 고객명 팝업 셀렉트 가져오기
+완료 - 자택주소 팝업 가져오기
+완료 - 가입상품목록 가져오기 
+완료 - 상세목록 가져오기
+완료 - 입금예정목록 가져오기
+완료 - 지금품목록 가져오기
+완료 - 추가회원 목록 가져오기
+
+
+수정가능 한곳 
+* 가입상품목록
+완료 - 수수료구분: 비율, 금액 셀렉트
+나중에 - 판촉원명: 팝업창
+완료 - 수수료율/금액: 입력가능
+완료 - 계약일자: 입력가능
+
+* 상세목록
+완료 - 회원유형: 셀렉트 박스
+완료 - 우대유형: 셀렉트 박스
+완료 - 개월, 일, 횟수
+완료 - 개시일자
+
+* 입금예정목록
+모두 수정 불가
+
+* 회원별 지금품정보
+완료 - 지급일자: 수정가능
+완료 - 지급품코드, 지급품명: 셀렉트
+완료 - 지금품구분: 수정불가
+완료 - 지급수량: 수정가능
+
+* 추가회원목록
+완료 - 1) 본인: 모두 수정 불가
+2) 본인 외: 고객번호, 고객명 수정불가, 나머지 수정가능 
+
+==========================================
+
+완료 - 신규버튼 로우 추가
+팝업창
+저장 하기
+수정 하기
+삭제 하기
+팝업창 선택 후 추가 경우에 따라서 추가로우
+기능 버튼 구현
+
+

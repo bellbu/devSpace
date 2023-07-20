@@ -151,3 +151,6 @@ ORDER BY MONTH, CAR_ID DESC
 소스트리 강의 4강 완료
 - 4강 다시 듣기
 =====================================
+
+AND (P_ROOM_NO IS NULL OR UPPER(ROOM_NO) LIKE '%'|| UPPER(P_ROOM_NO) ||'%')
+
