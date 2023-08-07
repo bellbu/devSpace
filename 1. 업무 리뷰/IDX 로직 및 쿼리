@@ -1,0 +1,117 @@
+1. 서비스단			
+rsvSendParam.put("callback", sendInfut.get("callBack").toString());
+rsvSendParam.put("rsvSendDate", sendInfut.get("rsvSendDate").toString());
+rsvSendParam.put("rsvSendTime", sendInfut.get("rsvSendTime").toString());
+rsvSendParam.put("title", sendInfut.get("title").toString());
+rsvSendParam.put("remarks", sendInfut.get("remarks").toString());
+
+
+for (int i = 0; i < memberGrid.size(); i++) {
+    rsvSendParam.put("guestNo", memberGrid.getJSONObject(i).getString("empNo"));
+    rsvSendParam.put("memName", memberGrid.getJSONObject(i).getString("empName"));
+    rsvSendParam.put("hpNo", memberGrid.getJSONObject(i).getString("hpNo"));
+
+    if (i == 0){
+        rsvSendParam.put("idx",i);
+    } else {
+        rsvSendParam.put("idx",result.get("O_IDX"));
+    }
+
+    result = crmSMSMapper.SMSAndTalkMngt_Rsv_Insert(rsvSendParam);
+    
+    if(!result.get("O_RESULT").equals("1")) {
+            break;
+    }
+}
+
+2. DB단
+
+     PROCEDURE SP_RSV_INSERT(
+                                 P_CORP_CODE       VARCHAR2
+                                ,P_RSV_SEND_DATE   VARCHAR2
+                                ,P_RSV_SEND_TIME   VARCHAR2
+                                ,P_GUEST_NO        VARCHAR2
+                                ,P_GUEST_NAME      VARCHAR2
+                                ,P_HP_NO           VARCHAR2
+                                ,P_CALL_HP_NO      VARCHAR2
+                                ,P_MSG_TITLE       VARCHAR2
+                                ,P_MSG_CONTENTS    VARCHAR2
+                                ,P_IDX             VARCHAR2
+                                ,P_INS_EMP_NO      VARCHAR2
+                                ,P_INS_IP          VARCHAR2
+                                ,O_RESULT          IN OUT VARCHAR2     -- 목록,상세조회 정보
+                                ,O_MSG             IN OUT VARCHAR2     -- 오류MSG
+                                ,O_IDX             IN OUT VARCHAR2
+                               )
+        IS
+            V_IDX VARCHAR2(100);
+
+        BEGIN
+
+            O_RESULT := '0';
+
+            IF P_IDX = 0 THEN
+                SELECT (NVL(MAX(TO_NUMBER(SEQ_NO)),0)+1) INTO V_IDX
+                FROM RVS01M
+                WHERE CORP_CODE = P_CORP_CODE;
+            ELSE
+                V_IDX := P_IDX;
+            END IF;
+
+            INSERT INTO RVS01M (
+                                CORP_CODE
+                                ,RSV_SEND_DATE
+                                ,RSV_SEND_TIME
+                                ,SEQ_NO
+                                ,IDX
+                                ,GUEST_NO
+                                ,GUEST_NAME
+                                ,HP_NO
+                                ,CALL_HP_NO
+                                ,MSG_TITLE
+                                ,MSG_CONTENTS
+                                ,SEND_YN
+                                ,INS_EMP_NO
+                                ,INS_DATE
+                                ,INS_IP
+                               )
+                VALUES (
+                        P_CORP_CODE,
+                        REPLACE(P_RSV_SEND_DATE,'-',''),
+                        P_RSV_SEND_TIME,
+                        V_IDX,
+                        (SELECT (NVL(MAX(TO_NUMBER(IDX)), 0) + 1)
+                         FROM RVS01M
+                         WHERE CORP_CODE = P_CORP_CODE
+                         AND RSV_SEND_DATE = REPLACE(P_RSV_SEND_DATE,'-','')
+                         AND RSV_SEND_TIME = P_RSV_SEND_TIME
+                         AND SEQ_NO = V_IDX
+                        ),
+                        P_GUEST_NO,
+                        P_GUEST_NAME,
+                        REPLACE(P_HP_NO,'-',''),
+                        P_CALL_HP_NO,
+                        P_MSG_TITLE,
+                        P_MSG_CONTENTS,
+                        'N',
+                        P_INS_EMP_NO,
+                        SYSDATE,
+                        P_INS_IP
+                       );
+
+            O_IDX := V_IDX;
+
+            O_RESULT := '1';
+
+        EXCEPTION
+        WHEN OTHERS THEN
+            BEGIN
+                O_MSG := SQLERRM;
+                DBMS_OUTPUT.PUT_LINE('O_MSG : ' || O_MSG);
+                RETURN;
+            END;
+
+        END;
+
+END PKG_SMSAndTalkMngt;
+/
