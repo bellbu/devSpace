@@ -1974,20 +1974,19 @@ f_RelationFeeBind();
 완료 - 상품구분 필수값 
 완료 - 일시납, 분납 로직 구분
 완료 - 신규버튼 => 행 추가 변경
-- 상품번호 인서트 때 넣어주기
- 서비스단 SnedSMSstaff_Send_SMS 참고해서 만들기
- 저장 시 버튼 시 모든 데이터 담아서 파라미터 넘겨주기
- 서비스 단에서 상품번호 발췌해서 각 그리드 세이브 넣어주기
+완료 - 상품번호 인서트 때 넣어주기
 
 상품등록 후에 생성가능
 * 상품가입등록 페이지
-- 비회원 고객 가입가능하게??
-- 신규시 메인 그리드 clear 
-- 보증금, 합계 나타나게
-- 계약일자 추출 finishEditng 
-- 상품정보 수정 막아놔라!!
-- 휴대폰 번호 필수값
-
-
-{data=type=edit&itemNo=0613&itemName=%ED%95%84%EC%88%98%EA%B0%92+%ED%85%8C%EC%8A%A4%ED%8A%B8&memDivisionType=&sign=&unsign=&silAmt=11%2C000&deposit=10%2C000&fee=1%2C000&netAmt=909&vatAmt=91&cmRate=0, 
-addData2=[], addData1=[{"guestType":"011","dcTypeCode":"001","contMon":"","contDay":"","cnt":"","useYn":"Y","itemNo":"0613","seq":"","type":"add","rowKey":0,"rowSpanMap":{}}], addData3=[{"suppliesCode":"1212","suppliesName":"12123","suppliesType":"001","qty":"0","useYn":"Y","itemNo":"0613","type":"add","rowKey":0,"rowSpanMap":{}}]}
+완료 - 비회원 고객 가입가능하게
+완료 - 휴대폰 번호 필수값
+완료 - 상품정보 수정 막아놔라!!
+완료 - 보증금, 합계 나타나게
+완료 - 계약일자 추출 finishEditng 
+완료 - 신규시 메인 그리드 clear 
+완료 - 비고 저장
+완료 - 전체 세이브
+완료 - 전부 테이블 삭제
+완료 - 수정 중 이동하면 초기화
+완료 - 컬럼 히든 처리
+완료 - 저장 후 카드 등록

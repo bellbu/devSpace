@@ -69,4 +69,16 @@ console.log("${loginVO}")
 //JSON 데이터 가져오기
 console.log(JSON.stringify(ReqDlvy));
 
+9. 등록/수정/삭제 시 setSelection() 기본 설정
+  1) 초기 전역변수 0으로 설정: var last_select_row = 0;
 
+  2) 그리드 loadComplete 설정
+    if($("#gr_List").getGrid().getRowCount() > last_select_row){ // 추가시: 생성로우 / 업데이트,삭제시: 제자리(setSelection은 첫줄이 1로 시작)
+      $("#gr_List").setSelection(last_select_row+1); 
+    }else{ // 마지막 로우 삭제 시: 첫줄 셀렉트
+      if($("#gr_List").getGrid().getRowCount() != 0){   
+        $("#gr_List").setSelection(1);
+      }
+    }
+
+  3)f_Create() 설정: last_select_row = $("#gr_List").getGrid().getRowCount();
