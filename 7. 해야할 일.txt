@@ -152,5 +152,7 @@ ORDER BY MONTH, CAR_ID DESC
 - 4강 다시 듣기
 =====================================
 
-AND (P_ROOM_NO IS NULL OR UPPER(ROOM_NO) LIKE '%'|| UPPER(P_ROOM_NO) ||'%')
+다시 시작하자!!
+WHERE 1=1 쓰는 이유?? https://hyjykelly.tistory.com/5
+CMD창 PING 무엇인지??
 

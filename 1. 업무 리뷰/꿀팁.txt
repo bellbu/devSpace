@@ -54,3 +54,22 @@
 
 
 -Dcatalina.base="C:\userveSpace\.metadata\.plugins\org.eclipse.wst.server.core\tmp0" -Dcatalina.home="C:\Program Files (x86)\Apache Software Foundation\Tomcat 7.0" -Dwtp.deploy="C:\userveSpace\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps" -Djava.endorsed.dirs="C:\Program Files (x86)\Apache Software Foundation\Tomcat 7.0\endorsed"
+
+※ 로그 확인 법
+1. 쿼리
+    SELECT *
+    FROM ACC_LOG
+    WHERE ACC_DETAIL LIKE '%CP113300%'
+    AND TO_CHAR(ACC_DATE,'YYYYMMDD') = '20230728'
+    ORDER BY ACC_DATE;
+
+2. SFTP
+ 1) 운영
+    192.168.1.106
+    192.168.1.107
+    ID: root PW: Vlszmtm6084!
+    로그 경로: /app/logs/PMS/skPinxPmslogs
+    
+ 2) 개발
+  192.168.31.203
+  ID: administrator	PW: 1234QWer!	

@@ -1,7 +1,48 @@
+* 김치간 접속정보
+1) 관리자 페이지 접속정보	
+  ID : userve  / PW : userve311!	
+
+2) 뮤지엄김치간 VPN 접속정보	
+  https://ssl2.pulmuone.com/	
+  ID : userve05  / PW : sslvpn!@34	
+	
+3) FTP 접속정보	
+  홈페이지 서버1 : 211.233.54.38	
+  홈페이지 서버2 : 211.233.54.39	
+  ID : root  / PW : qhRWka!$$038 , qhRWka!$$039  ( 뒤 3자리 숫자는 각 서버별 IP 뒷자리 )	
+	
+4) DB(REAL)
+192.1.5.21:3306	
+database : kimchikan	
+ID : root / PW : Rlacl0619)^!(	
+	
+5) DB(DEV) 	
+192.168.31.214:3306	
+database : kimchikan	
+id : root / PW : Userve0822!	
+	
+
+* 김치간 알림톡
+1) 알림톡 작업내역
+  - 6월 20일 예약완료(예약안내), 3일전, 당일
+  - 7월 3일 예약완료(예약안내), 취소, 당일
+  - 8월 22일 예약완료(예약안내), 3일전, 당일
+
+2) 작업 방법
+  - 예약안내(예약안내) 셀렉트 박스 등록 PHP - html-admin-schedule-add.php
+  - 예약안내(예약안내) 템플릿 등록 테이블 - wp_template
+  - 3일전 프로시저 - earlyVisitGuideSms(3일전)
+  - 당일 프로시저 - earlyVisitGuideSms_day(당일) 
+  - 취소 PHP - class-hamakimchi-ajaxs.php (do_reserved_cancel / do_reserved_cancel_new / do_hompage_reserve_cancel 함수에 취소 템플릿 추가)
+  - 알림톡 예약 테이블: wp_posts_sms
+
+3) 서버반영 경로
+/home/pmouser/public_html/wp-content 해당경로
+
+* 김치간 뮤지엄 중복검사
 wp_posts.id = wp_postmeta.post_id, wp_rsv_m.post_id, wp_rsv_d.post_id
 wp_postmeta.meta_key = wp_rsv_m.meta_key,wp_rsv_d.meta_key
 
-* 예약오픈 시 이슈해결 정리
 1. 테이블 정리
   1) 프로그램 관리 테이블 : wp_posts (PK: ID)
   2) 구 예약데이터 테이블 : wp_postmeta(PK: meta_id)
@@ -9,39 +50,35 @@ wp_postmeta.meta_key = wp_rsv_m.meta_key,wp_rsv_d.meta_key
   4) 신규 예약데이터 디테일 테이블: wp_rsv_d(PK: rsv_no, rsv_seq) - 개인정보 암호화 되어있음
 
 2. 발생예상 문제
-  1) 기존 예약테이블의 예약키는 wp_postmeta 의 meta_key
-  meta_key는 시간을 만들어지기 때문에 중복되는 값이 생길 수 있어서 문제가 발생
-
-  질문0) 예약하는 경우 구예약테이블, 신규예약테이블 마스터, 신규예약테이블 디테일 3개 테이블 인서트 되는지??
-  질문1) 구 예약데이터의 meta_key 영문인 경우 무슨의미?? 
-  질문2) 프로그램 관리 테이블의 post_content의 예약인원 reserved_count 확인 방법??
-
+  - 구 예약키(meta_key)는 시간으로 만들어지기 때문에 중복문제가 발생할 가능성 있음(예약자는 다른데 예약키가 같은 경우)
+  - 아래 쿼리 중 키(meta_key) 중복조회 쿼리 실행하여 조회되는게 없을 경우 김치간에서 메일오는 건에 대하여 확인해주면 됨.
 
 3. 프로그램 오픈 시 체크
   1) 기존 예약키 중복으로 A의 예약을 취소 시 B의 예약도 취소 될 수 있음.
-    - 신규 예약데이터 테이블의 예약번호(rsv_no)는 다르게 생성되더라도 구 예약키가 동일하여 구 예약테이블의 예약데이터를 취소 시키고  프로그램 인원도 따로 조정될 수 있음.
+    - 신규 예약데이터 테이블(wp_rsv_m)의 예약번호(rsv_no)는 다르게 생성되더라도 구 예약키(meta_key)가 동일하여 구 예약테이블의 예약데이터를 취소 시키고 프로그램 인원도 따로 조정될 수 있음.
     - 처리방법 : meta_key의 값을 1씩 증가해서 조회하여 데이터가 없을 경우 중복되는 예약 중 하나를 해당 key로 변경해준다
               구 예약테이블, 신규예약 마스터, 신규예약 디테일 3개 테이블 수정 필요
 
-  2) 신규 예약테이블 메인(wp_rsv_m) 에 데이터가 생성되지 않을 수 있음.
+  2) 신규 예약테이블 메인(wp_rsv_m)에 데이터가 생성되지 않을 수 있음.
     - 두건의 예약건이 하나의 예약번호에 seq가 확장되어 생성될 수 있음.
       ex) 원래대로면 (MK000001, 1),  (MK000002, 1) 로 생성되어야 하나, (MK000001, 1),  (MK000001, 2) 로 생성되는 케이스 존재
     - 처리방법 : 1 의 처리방법으로 meta_key 중복 해소 후 신규예약번호(MAX(RSV_NO) 생성하여  분기
 
   3) 1번의 케이스로 프로그램인원이 맞지 않을 수 있음.
     - 실제 예약데이터의 인원수와 프로그램의 예약인원수가 맞지 않는 케이스 존재
-    - 처리방법 : wp_posts 의 post_date 로 프로그램 일정 확인 후, id 값이 프로그램 키이며,  해당 row의 post_content 값중 reserved_count 가 예약인원 
-                wp_posts 의 예약인원, wp_postmeta 의 예약인원, wp_rsv_m 의 예약인원이 일치해야함.
+    - 처리방법 : wp_posts의 post_date로 프로그램 일정 확인 후 post_content값 중 reserved_count 예약인원 확인 
+                wp_posts의 예약인원, wp_postmeta 의 예약인원, wp_rsv_m 의 예약인원이 일치해야함.
 
 ※ wp_posts.id 인원 = wp_postmeta.post_id 인원 합산 = wp_rsv_m.post_id 인원 합산
 ※ 각 테이블의 meta_key 1:1:1 관계여야 함 
 
-아래 쿼리 중 키(meta_key) 중복조회 쿼리 실행하여 조회되는게 없을 경우 김치간에서 메일오는 건에 대하여 확인해주면 됨.
+1. 중복키 없음
+2. 메타키 생성 확인 완료
 
 --------------------------------------------------------------------------------------------------
 
 * 쿼리 조회
-1) 키(meta_key) 중복조회 쿼리
+1) 현재 이후 프로그램의 구 예약 데이터 메타키(meta_key) 중복조회 쿼리
   select * 
   from (
         select post_id,
@@ -107,6 +144,13 @@ wp_postmeta.meta_key = wp_rsv_m.meta_key,wp_rsv_d.meta_key
   where post_id = 10489
   and meta_value like '%num";s:1%'
 
+  select SUBSTRING_INDEX(meta_value, 'num";s:1:', -1) AS cnt
+  		 ,meta_value
+  from wp_postmeta
+  where post_id = 10366
+  and meta_value like '%num";s:1%'
+
+
 7) 신규 예약데이터 테이블 마스터(wp_rsv_m) 인원체크
   select post_id,
         sum(mem_cnt) 
@@ -124,3 +168,5 @@ wp_postmeta.meta_key = wp_rsv_m.meta_key,wp_rsv_d.meta_key
       mem_cnt = %d,
       upd_date = NOW()
   WHERE rsv_no = %s
+
+

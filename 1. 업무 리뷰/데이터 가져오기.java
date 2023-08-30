@@ -81,4 +81,9 @@ console.log(JSON.stringify(ReqDlvy));
       }
     }
 
-  3)f_Create() 설정: last_select_row = $("#gr_List").getGrid().getRowCount();
+  3) 바인드 설정 
+    function f_GridBind(rowid) {
+        last_select_row = rowid;
+    }
+
+  4)f_Create() 설정: last_select_row = $("#gr_List").getGrid().getRowCount();
