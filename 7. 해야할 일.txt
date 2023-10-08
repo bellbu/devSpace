@@ -153,6 +153,15 @@ ORDER BY MONTH, CAR_ID DESC
 =====================================
 
 다시 시작하자!!
-WHERE 1=1 쓰는 이유?? https://hyjykelly.tistory.com/5
-CMD창 PING 무엇인지??
+1.WHERE 1=1 쓰는 이유??
+조건절 변경 시 수정이 편리함: WHERE절 셋팅 AND절만 수정하면 됨
+
+2.CMD창 PING 무엇인지?? 
+- ping이란 Paket Internet Groper의 약자이며 컴퓨터 네트워크 상태를 점검, 진단하는 명령어
+- 패킷이란 데이터 조각을 의미
+
+3.DECODE와 CASE WHEN 차이
+4.제스퍼 사용법
+
+
 

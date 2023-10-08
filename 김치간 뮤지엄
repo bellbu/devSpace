@@ -29,11 +29,11 @@ id : root / PW : Userve0822!
   - 8월 22일 예약완료(예약안내), 3일전, 당일
 
 2) 작업 방법
-  - 예약안내(예약안내) 셀렉트 박스 등록 PHP - html-admin-schedule-add.php
-  - 예약안내(예약안내) 템플릿 등록 테이블 - wp_template
-  - 3일전 프로시저 - earlyVisitGuideSms(3일전)
-  - 당일 프로시저 - earlyVisitGuideSms_day(당일) 
-  - 취소 PHP - class-hamakimchi-ajaxs.php (do_reserved_cancel / do_reserved_cancel_new / do_hompage_reserve_cancel 함수에 취소 템플릿 추가)
+  - 템플릿 등록 테이블 - wp_template
+  - 예약안내(예약안내) 템플릿: 셀렉트 박스 등록 PHP - html-admin-schedule-add.php
+  - 3일전 템플릿: 프로시저 - earlyVisitGuideSms(3일전)
+  - 당일 템플릿: 프로시저 - earlyVisitGuideSms_day(당일): 예약안내 추가 후 당일 템플릿 조건 추가 
+  - 취소 템플릿: PHP - class-hamakimchi-ajaxs.php (do_reserved_cancel / do_reserved_cancel_new / do_hompage_reserve_cancel 함수에 취소 템플릿 추가)
   - 알림톡 예약 테이블: wp_posts_sms
 
 3) 서버반영 경로
@@ -50,7 +50,7 @@ wp_postmeta.meta_key = wp_rsv_m.meta_key,wp_rsv_d.meta_key
   4) 신규 예약데이터 디테일 테이블: wp_rsv_d(PK: rsv_no, rsv_seq) - 개인정보 암호화 되어있음
 
 2. 발생예상 문제
-  - 구 예약키(meta_key)는 시간으로 만들어지기 때문에 중복문제가 발생할 가능성 있음(예약자는 다른데 예약키가 같은 경우)
+  - 구 예약키(meta_key)는 시간으로 만들어지기 때문에 중복문제가 발생할 가능성 있음(한 프로그램에 예약자는 다른데 예약키가 같은 경우)
   - 아래 쿼리 중 키(meta_key) 중복조회 쿼리 실행하여 조회되는게 없을 경우 김치간에서 메일오는 건에 대하여 확인해주면 됨.
 
 3. 프로그램 오픈 시 체크
@@ -60,14 +60,18 @@ wp_postmeta.meta_key = wp_rsv_m.meta_key,wp_rsv_d.meta_key
               구 예약테이블, 신규예약 마스터, 신규예약 디테일 3개 테이블 수정 필요
 
   2) 신규 예약테이블 메인(wp_rsv_m)에 데이터가 생성되지 않을 수 있음.
-    - 두건의 예약건이 하나의 예약번호에 seq가 확장되어 생성될 수 있음.
+    - 두건의 예약건이 하나의 예약번호(rsv_no)에 seq가 확장되어 디테일 테이블(wp_rsv_d)에 생성될 수 있음.
       ex) 원래대로면 (MK000001, 1),  (MK000002, 1) 로 생성되어야 하나, (MK000001, 1),  (MK000001, 2) 로 생성되는 케이스 존재
-    - 처리방법 : 1 의 처리방법으로 meta_key 중복 해소 후 신규예약번호(MAX(RSV_NO) 생성하여  분기
+    - 처리방법 : 디테일 meta_key 중복 해소, 신규예약번호(MAX(RSV_NO) 생성하여 분기 => 마스터 테이블에 해당 정보 등록시켜 1:1 관계 만들어 줌
 
   3) 1번의 케이스로 프로그램인원이 맞지 않을 수 있음.
     - 실제 예약데이터의 인원수와 프로그램의 예약인원수가 맞지 않는 케이스 존재
     - 처리방법 : wp_posts의 post_date로 프로그램 일정 확인 후 post_content값 중 reserved_count 예약인원 확인 
                 wp_posts의 예약인원, wp_postmeta 의 예약인원, wp_rsv_m 의 예약인원이 일치해야함.
+
+  4) 인원 초과인 경우
+   - wp_posts에서  reserv_count 25로 변경
+
 
 ※ wp_posts.id 인원 = wp_postmeta.post_id 인원 합산 = wp_rsv_m.post_id 인원 합산
 ※ 각 테이블의 meta_key 1:1:1 관계여야 함 
@@ -170,3 +174,57 @@ wp_postmeta.meta_key = wp_rsv_m.meta_key,wp_rsv_d.meta_key
   WHERE rsv_no = %s
 
 
+
+===============================================================================
+
+* 메타키 중복키 제거 쿼리
+  
+ -- wp_postmeta / wp_rsv_m / wp_rsv_d 
+  
+select * 
+from (
+	  select post_id,
+	         meta_key,
+	         count(*) cnt 
+	  from wp_postmeta 
+	  where post_id in(select id from wp_posts wp where post_date > now())
+	  group by post_id, meta_key
+     ) a
+where a.cnt > 1
+  
+select * 
+from wp_postmeta wp 
+where 1=1
+and post_id = 10589
+and meta_key = '1695359058'
+  
+  
+SELECT rsv_no,
+        post_id,
+        meta_key,
+        cast(AES_DECRYPT(UNHEX(name), 'name') as char(127) character set utf8)   name,
+        cast(AES_DECRYPT(UNHEX(hp_no), 'hp_no') as char(127) character set utf8) hp_no,
+        cast(AES_DECRYPT(UNHEX(mail), 'mail') as char(127) character set utf8) mail,
+        cast(AES_DECRYPT(UNHEX(home_addr1), 'addr1') as char(127) character set utf8) addr1,
+        cast(AES_DECRYPT(UNHEX(home_addr2), 'addr2') as char(127) character set utf8) addr2,
+        mem_cnt 
+FROM wp_rsv_m a
+where 1=1
+and post_id = 10589
+and meta_key = '1695359058'
+  
+
+SELECT rsv_no,
+       post_id,
+       meta_key,
+       rsv_seq,
+       cast(AES_DECRYPT(UNHEX(name), 'name') as char(127) character set utf8)   name,
+       cast(AES_DECRYPT(UNHEX(hp_no), 'hp_no') as char(127) character set utf8) hp_no,
+       cast(AES_DECRYPT(UNHEX(mail), 'mail') as char(127) character set utf8) mail,
+       ins_date,
+       mem_cnt  
+from wp_rsv_d
+where 1=1
+and post_id = 10589
+and meta_key = '1695359058'
+  
