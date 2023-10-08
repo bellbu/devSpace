@@ -2336,11 +2336,11 @@ gr_Item 업데이트 주석 풀기, 필요없는 컬럼 히든처리
 4)실적관리: amPrfrMngm
 
 
-AMB08M = AMB04M(파크) + AMB05M(스포츠) + AMB06M(기타)
+AMB08M = AMB04M(파크) + AMB05M(기타) + AMB06M(스포츠)
 
 AND WORKGRP_CODE IN (300, 500) -- 파크
-AND WORKGRP_CODE IN (100, 200) -- 스포츠
 AND WORKGRP_CODE IN (700, 800, 900) --기타
+AND WORKGRP_CODE IN (100, 200) -- 스포츠 
 
 
 완료 - 아이디값 일치
@@ -2472,8 +2472,6 @@ B422_0097 => B422_0098
 - 연회행사, 영업장 수정안되고 판촉직원만 수정되는게 맞는지
 
 
-
-
 오늘
 상품등록, 상품가입등록, 
 상품등록 
@@ -2484,3 +2482,368 @@ B422_0097 => B422_0098
 완료 - 법인일 때 유효성 검사
 저장 후 로드된 로우키 선택
 지급수량 빨간색 확인
+
+
+* 오늘 할 일
+상품가입등록
+완료 - 저장 후 해당위치 
+완료 - 버튼위치 변경
+완료 - 유효성 검사
+완료 - 판촉원 팝업 조회 안됨
+완료 - 상품조회 팝업 조회 안됨
+
+* 통합예약취소내역조회 핀크스
+1. 예약일자 조회
+- 파라미터
+sBookStDate : $("#sBookStDate").getCal(),
+sBookEdDate : $("#sBookEdDate").getCal(),
+sBookName : $("#sBookName").val(),
+sGuestType : $("#sGuestType").val(),
+sSourceCode : $("#sSourceCode").val(),
+sNoShowCancel : $("#sNoShowCancel").val()
+- 주소
+/rsv/SaveReservCancel_Select.do
+
+
+2. 검색조건 전체예약
+- 파라미터
+sStReservDate   :  $("#sBookStDate").getCal(),
+sEdReservDate   :  $("#sBookEdDate").getCal(),
+sBookName : $("#sBookName").val(),
+sGuestType : $("#sGuestType").val(),
+sSourceCode : $("#sSourceCode").val(),
+sNoShowCancel : $("#sNoShowCancel").val(),
+- 주소
+url : "/rsv/SaveReservCancel_Detail_Select.do",
+
+3. 바인드 당일 예약
+- 파라미터
+sStReservDate   : rowData['saleDate'].replaceAll('-',''),
+sEdReservDate   : rowData['saleDate'].replaceAll('-',''),
+sBookName : $("#sBookName").val(),
+sGuestType : $("#sGuestType").val(),
+sSourceCode : $("#sSourceCode").val(),
+sNoShowCancel : $("#sNoShowCancel").val()
+- 주소
+url : "/rsv/SaveReservCancel_Detail_Select.do",
+
+
+* 오늘 할 일(20230901)
+1. 핀크스(통합예약 취소 작업)
+- 컬럼
+ 골프: golfCnt 
+ 포도호텔: hotelPodoCnt 
+ 아넥스: hotelAnnexCnt
+ 비오토피아: hotelBioCnt
+- 테이블: 
+ BSH01M(월력정보)
+ RSA51S(통합예약)
+ RSA50S(골프예약)
+ CRA01M(고객정보)
+
+2. 원마운트
+ - 오류 엑셀 정리
+ - 오류 수정
+
+
+http://erp.onemount.co.kr/cr/cr301/CR30101.do?menuCode=001003003001&menuId=CR
+
+
+* 오늘 할 일(20230904)
+- 상품관리 추가회원 삭제 시 상품삭제 원인
+
+가입 상품 셀렉트
+CRA03M 가입상품정보
+CRG01M 상품정보
+CRG04D 입금예정정보
+
+추가회원 삭제
+CRA03M 가입상품정보
+CRB01M 회원카드/증서발급정보
+
+단체고객등록
+
+
+* 원마운트 단체 남은 오류들
+영업장별행사조회: 행사업장 셀렉트 박스 조회 => work_code, upjang_code 구분??
+결과통보서: 계약직원 조회인지 판촉직원 조회인지??
+
+* 오늘 할일
+오전
+완료 - 핀크스 반영 후 매니저 
+완료 - 엑셀 정리
+- 원마운트오류 수정
+
+오후
+핀크스 영수증 업무
+
+* 오늘 할 일(2023-09-08)
+핀크스
+ - 증서문서출력 오류 확인
+ - 제스퍼 
+ - 통합예약취소내역조회
+
+루나엑스
+ - 정의서 작성
+
+
+* 오늘 할 일(2023-09-11) 
+완료 - 지라 엑셀 반영 작성
+완료 - 단체 테이블 작성
+경기진행등록 프로세스 파악
+
+ 1. 경기진행등록(15일)
+	- 프로세스: 통합예약 => 내장객접수등록 => 경기진행등록
+	- 제외항목: 캐드 => 카트(카트정보 등록 참고) 변경, 캐디피 삭제, 식사중 삭제, 캐디실공지사항 삭제
+			추천인, 골프백 삭제
+	- 변경항목: 3 => 4코스(공통코드 RS511)
+	- 화면들: 메인화면 / 카트 팝업창 / 경기진행정보 수정 팝업창 / 스코어카드등록 / 골프내장객 상세조회 팝업창 / 팀배정표 출력
+			2           2               2                    2                  2                         2
+
+
+* 내장객접수등록
+gr_BookList -- 좌측 상단 예약 그리드
+gr_reservList -- 좌측 하단 연결예약정보
+
+gr_entrListD -- 중간 그리드
+
+gr_record -- 우측 상단 회원정보 그리드
+gr_reserveList -- 우측 상단 골프예약현황 그리드
+gr_GuestUniquenessList -- 우측 하단 그리드
+
+
+
+* 김치간 뮤지엄
+당일안내 알림톡 템플릿 추가 
+당일안내 스케쥴러 내 추가
+
+
+* 오늘 할 일(2023-09-12)
+루나엑스
+- 부사장님 골프 프로세스 회의
+- 코드파악
+- 환경셋팅
+- 메뉴 등록
+
+김치간 뮤지엄
+-당일안내 알림톡 템플릿 추가 
+
+
+
+우선적인 업무
+코드파악
+url 정리
+프로시저 테이블 파악
+테이블 비교
+
+
+일마감관리
+요금정산관리 
+
+
+* 오늘 할 일
+고객정보: 회사명, 직위 
+회원정보 탭, 골프예약현황 탭
+연결예약정보그리드
+지불내역그리드
+작업 후 vMemType => vGuestType 변경
+
+
+보류 - 공통코드 GB015 추가 할지
+보류 - 인턴메모(internmeno) 추가(IM003):초기화, 바인드 ,버튼생성
+
+* 골프관련 테이블 정의
+RSA50S: 골프예약
+RSA51S: 통합예약
+RSA52S: 골프타임시트
+GBC03S: 캐디, 카트
+GBA01M: 내장M
+GBA01D: 내장D
+
+* 질문사항
+할인금액(1인): 할인금액 어떻게 나타나는지?? 
+              RSA50S 골프예약의 할인율
+
+요금구분: 골프타임시트 RSA52S 적용 요금코드에서 가져오는지?
+
+단체명, 단체코드 어디서??
+
+* 내장 저장
+if (예약: rsa50s, rsa54s 조회)
+ -> 내장M, 내장D 저장
+else (워크인)
+ -> 통합예약 
+ -> 골프예약
+ -> 내장M, 내장D 저장
+
+rsa54s 내장자 D 정보를 뿌려 줌
+
+* 시작 프로세스 순서 
+1) f_search_btn(): f_search() 호출 => 2) f_search(): input 초기화, 
+                                                     마감여부 조회, 
+                                                     Day Type Code 조회, 
+                                                     골프타임시트를 ds_BookList 담은 후 fillBookList() 호출해서 그리드 그려 줌
+
+* 예약리스트 바인드 프로세스
+1) f_GridUpdateRow(): 우측 고객정보 초기화, f_search_entrM() 호출  
+2) f_search_entrM(): 선택된 예약정보에 예약번호 없는 경우 "WORKIN", 예약정보 있는 경우 "VISITOR" 
+                     bookJson에 ds_BookList(골프타임시트) 담음
+                     selectedItem에 선택된 예약정보를 담아서 input값을 뿌려줌
+                     ds_entrListM에 예약 마스터 정보를 담아서 input값에 뿌려줌
+                     f_search_entrD(타임시트정보, 예약마스터정보) 호출
+3) f_search_entrD(): ds_entrListTemp에 예약 디테일 담음
+                     ds_BookListComp에 내장공통을 담은 후 ds_BookListCompOnLoadCompleted(내장공통) 호출
+
+4) ds_BookListCompOnLoadCompleted(): 예약 디테일 그리드 초기화,
+                                     ds_BookListObj에 선택된 예약정보를 담음
+                                     예약 디테일의 정보와 적용요금 담아서 그리드로 그려 줌 
+                                                                       
+* 요약 
+시작 프로세스: ds_BookList(예약 리스트)
+바인드 프로세스: ds_entrListM(예약 마스터)
+                ds_entrListTemp(예약 디테일)
+
+
+                
+* 오늘 할일
+완료 - 4개 줄 나타내기
+완료 - 저장 후 상태 내장 변경
+완료 - 연결예약정보 바인드
+완료 - 골프예약현황 바인드(고객번호 존재하지 않아 조회 안됨)
+추후 - 지불내역 바인드
+그린피, 카트료, 입장료, 
+워크인 저장
+완료 - 금액
+
+
+grvPopupService -> grvSaveReservFormPop_Control
+
+@RequestMapping(value = "/grvPopup/grvSaveReservFormPop_GolfCartFeeSelect.do")
+	public void grvSaveReservFormPop_GolfCartFeeSelect(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		HashMap<String, Object> param = RequestUtil.getParameter(request);
+		List<?> list = grvPopupService.grvSaveReservFormPop_GolfCartFeeSelect(param);
+		System.out.println("list>>>");
+		System.out.println(list);
+		CommonUtil.printTuiGridSet(param, list, response);
+	}
+
+
+  grvSaveReservFormPop_GolfReservCancel
+
+grvPopupMapper
+
+
+보시면 이거 호출하면 돼요
+그냥 별거없는 쿼리라 같이쓰는게 나을것같아여
+
+
+연결예약정보
+/rrvReservPop/rrvSaveReservCancelPop_Reserv_Select.do
+
+
+
+===============================================================================
+2023-09-07 (목)
+* 원마운트(실질적 10월 13일까지(20일), 10월 20일 까지(25일)) 
+1. 경기진행등록(15일)
+	- 프로세스: 통합예약 => 내장객접수등록 => 경기진행등록
+	- 제외항목: 캐드 => 카트(카트정보 등록 참고) 변경, 캐디피 삭제, 식사중 삭제, 캐디실공지사항 삭제
+			추천인, 골프백 삭제
+	- 변경항목: 3 => 4코스(공통코드 RS511)
+	- 화면들: 메인화면 / 카트 팝업창 / 경기진행정보 수정 팝업창 / 스코어카드등록 / 골프내장객 상세조회 팝업창 / 팀배정표 출력
+			2           2               2                    2                  2                         2
+
+2. 골프기록등록(4일)
+
+
+2. 단체쪽(6일)
+단체고객등록(3일)
+
+
+
+타임시트추가, 
+
+
+* 예약일 때 내장객추가, 내장객 삭제 안나타나게
+* 오늘 할 일
+완료 - 내장객 수정
+완료 - 내장객삭제 버튼
+완료 - 내장팀삭제 버튼
+완료 - 연결예약상세조회(골프랑 영업장 탭만)
+- 내장객추가 쿼리 수정
+- 예약시 내장객 추가 버튼x
+완료 - 지불내역
+
+- 골프예약현황 탭
+
+추후 - 내장객명 탭
+추후 - 입장료 세부조정
+추후 - 캐디카트금액변경
+
+
+
+* 루나엑스 내장객 접수등록 피드백
+완료 - 1.요금 세부 조정(입장료 => 그린피, 카트료)
+  입장료(총금액): 그린피 + 카트료 
+  GBA01D -- ENTR_FEE 그린피, 
+  RSA54S -- 카트료  
+   입장료(총금액)
+
+완료 - 2. 타임시트 팝업 수정
+
+완료 - 3. 레인체크 오류 수정
+
+4. 내장객 삭제, 내장객 추가 쿼리 수정 예정
+ 마스터(GBA01M) 테이블로 CNT 변경
+
+5. 고객정보, 예약정보 바인드 수정 
+
+6. 예약금 관리
+ 예약팀 저장하는 경우 => 예약금관리(사용 변경)
+
+
+* 내장객 접수등록
+(완료) 1.요금 세부 조정(입장료 => 그린피, 카트료)
+(완료) 2. 타임시트 오류 수정
+(완료) 3. 레인체크 오류 수정
+(완료) 4. 골프이용조회/대여품등록 팝업 추가
+
+(완료) 5. 내장객 추가/삭제 인원기준 쿼리 수정
+(완료) 6. 내장객 팝업 추가
+(완료) 7. 고객정보, 예약정보 바인드 수정 
+
+8. 예약팀 저장 시 예약금 관리 추가(박책임님 가이드)
+(보류) 9. 워크인 접수등록 
+
+01m
+CORP_CODE
+BOOK_DATE
+RESERV_NO
+RESERV_SEQ
+
+
+50S
+CORP_CODE
+RESERV_NO
+RESERV_SEQ
+BOOK_DATE
+COSE
+TIME
+
+52s 타임시트
+CORP_CODE
+BOOK_DATE
+COSE
+TIME
+
+
+
+
+인원 
+내장 => MemCnt
+예약 => teamMemCnt
+기본타임시트 => playMemCnt
+
+1. 지불내역 추가확인
+2. 요금정산관리 사용 확인

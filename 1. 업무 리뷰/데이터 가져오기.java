@@ -87,3 +87,20 @@ console.log(JSON.stringify(ReqDlvy));
     }
 
   4)f_Create() 설정: last_select_row = $("#gr_List").getGrid().getRowCount();
+
+
+
+10. 신규 로우 
+	 	var createRow = $("#gr_List").getRowData(rowid)._attributes.className.column._number
+	 	console.log("createRow",createRow);
+	 	if(createRow){
+	 		$("#gr_List").setSelection(rowid)
+	 		alert('변경된 내용이 있습니다.');
+	 		return false;
+	 	}
+
+11. 페이지 이동
+$("#gr_List").getGrid().getPagination().movePageTo(targetRowsPageNum);
+
+
+$("#gr_List").movePageTo($("#gr_List").getGrid().getPagination()._currentPage);
