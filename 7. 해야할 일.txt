@@ -160,10 +160,14 @@ ORDER BY MONTH, CAR_ID DESC
 - 패킷이란 데이터 조각을 의미
 
 3.DECODE와 CASE WHEN 차이
+- DECODE: statement, NULL 비교 연산 가능
+- CASE WHEN: 함수, NULL 비교 연산 불가 (IS NULL 사용해야 함)
+ 
 4.제스퍼 사용법
-5. 메이븐이란?
-6. DAO, impl 
-7. ibatis, mybatis 란?
+5. 메이븐이란? https://goddaehee.tistory.com/199
+6. DAO, impl
+7. DAO, VO, DTO 차이? https://velog.io/@selffy/DAO-DTO-Service-Impl
+
 
 
 
