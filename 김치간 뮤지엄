@@ -30,7 +30,8 @@ id : root / PW : Userve0822!
 
 2) 작업 방법
   - 템플릿 등록 테이블 - wp_template
-  - 예약안내(예약안내) 템플릿: 셀렉트 박스 등록 PHP - html-admin-schedule-add.php
+  - 예약안내(예약안내) 템플릿: 셀렉트 박스 등록 PHP - html-admin-schedule-add.php 
+    (서버 파일경로: /home/pmouser/public_html/wp-content/plugins/kimchigan/admin/partials)
   - 3일전 템플릿: 프로시저 - earlyVisitGuideSms(3일전)
   - 당일 템플릿: 프로시저 - earlyVisitGuideSms_day(당일): 예약안내 추가 후 당일 템플릿 조건 추가 
   - 취소 템플릿: PHP - class-hamakimchi-ajaxs.php (do_reserved_cancel / do_reserved_cancel_new / do_hompage_reserve_cancel 함수에 취소 템플릿 추가)
