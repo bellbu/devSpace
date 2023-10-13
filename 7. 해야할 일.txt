@@ -162,7 +162,8 @@ ORDER BY MONTH, CAR_ID DESC
 3.DECODE와 CASE WHEN 차이
 4.제스퍼 사용법
 5. 메이븐이란?
-
+6. DAO, impl 
+7. ibatis, mybatis 란?
 
 
 
