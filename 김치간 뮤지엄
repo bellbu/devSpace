@@ -1,3 +1,4 @@
+
 * 김치간 접속정보
 1) 관리자 페이지 접속정보	
   ID : userve  / PW : userve311!	
@@ -49,6 +50,7 @@ wp_postmeta.meta_key = wp_rsv_m.meta_key,wp_rsv_d.meta_key
   2) 구 예약데이터 테이블 : wp_postmeta(PK: meta_id)
   3) 신규 예약데이터 테이블: wp_rsv_m(PK: rsv_no) - 개인정보 암호화 되어있음
   4) 신규 예약데이터 디테일 테이블: wp_rsv_d(PK: rsv_no, rsv_seq) - 개인정보 암호화 되어있음
+  5) msg_data2 인증번호 테이블
 
 2. 발생예상 문제
   - 구 예약키(meta_key)는 시간으로 만들어지기 때문에 중복문제가 발생할 가능성 있음(한 프로그램에 예약자는 다른데 예약키가 같은 경우)
@@ -229,3 +231,43 @@ where 1=1
 and post_id = 10589
 and meta_key = '1695359058'
   
+
+
+
+
+
+  select * from wp_posts
+where post_date like '2023-11%'
+구예약 인원조회
+select * from wp_postmeta
+where post_id = 10613
+and meta_value like '%num";s:1%'
+신예약마스터 인원조회
+select post_id,sum(mem_cnt) from wp_rsv_m
+where post_id between 10613 and 10620
+group by post_id
+SELECT rsv_no,post_id,meta_key,
+         cast(AES_DECRYPT(UNHEX(name), 'name') as char(127) character set utf8)   name,
+         cast(AES_DECRYPT(UNHEX(hp_no), 'hp_no') as char(127) character set utf8) hp_no,
+         cast(AES_DECRYPT(UNHEX(mail), 'mail') as char(127) character set utf8) mail,
+         cast(AES_DECRYPT(UNHEX(home_addr1), 'addr1') as char(127) character set utf8) addr1,
+         cast(AES_DECRYPT(UNHEX(home_addr2), 'addr2') as char(127) character set utf8) addr2,
+         mem_cnt ,use_yn
+         FROM wp_rsv_m a
+where 1=1
+#and cast(AES_DECRYPT(UNHEX(name), 'name') as char(127) character set utf8) like '%지서율%'
+#and cast(AES_DECRYPT(UNHEX(hp_no), 'hp_no') as char(127) character set utf8) = '010-3603-1923'
+#and rsv_no = 'MK233548'
+and post_id = 10613	
+#and meta_key in('1697605287','1697605288')
+SELECT rsv_no,post_id,meta_key,rsv_seq,
+         cast(AES_DECRYPT(UNHEX(name), 'name') as char(127) character set utf8)   name,
+         cast(AES_DECRYPT(UNHEX(hp_no), 'hp_no') as char(127) character set utf8) hp_no,
+         cast(AES_DECRYPT(UNHEX(mail), 'mail') as char(127) character set utf8) mail,
+         ins_date,
+         mem_cnt  from wp_rsv_d
+where 1=1
+#and rsv_no = 'MK223719'
+and post_id = 10613	
+#and meta_key in('1697605287','1697605288')
+order by rsv_no,rsv_seq

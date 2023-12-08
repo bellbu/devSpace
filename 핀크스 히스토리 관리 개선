@@ -1,0 +1,132 @@
+* 히스토리(누가? 언제? 어떤데이터를 어떻게 수정?) - 등록: 신규 / 수정: 수정컬럼 / 삭제: 중요 키워드 삭제
+ - 신규화면: 개인정보처리로그, 권한관리로그  
+ - 기존화면 탭 추가: 개인별예약변경화면: 대여품 탭 추가, 
+ 
+1. (신규) 개인정보처리로그 페이지 
+ 1) 테이블
+  - 개인정보 관련(CRA01M, CRA02M)
+  - 회원정보 페이지: 회원정보, 혜택, 포인트, 계약정보 테이블
+  - 수행한 업무내역: 개인정보취급자 등의 계정, 접속일시, 접속지 정보, 처리한 정보주체 정보, 수행업무(조회, 신규, 수정, 삭제, 엑셀)
+
+2. (신규) 권한관리로그
+  - 개인정보처리시스템 접근권한 부여, 변경, 말소 내역 기록
+  ex) 계정신규생성 : 사용자관리 페이지 내용(COA01H, COA01S)
+      권한등급부여, 권한그룹코드 : 사용자관리 페이지 내용
+      인사정보변경 - 권한그룹코드 초기화(null값), 계정사용여부N : 사용자관리 페이지 
+      사용자별권한관리 - '회원관리' 추가 : 사용자별 권한 관리
+
+3. (기존) 개인별예약변경조회:
+  - 호텔 및 골프에서 대여품 등록/변경/삭제에 대한 history도 확인
+
+4. (기존) 접근로그
+  - UNION ALL
+  
+정보구분 컬럼: 일반(CRA01M), 회원(CRA02M) - UNION ALL
+구분: 조회(ACC_LOG), 엑셀(ACC_LOG), 신규(히스토리 테이블), 수정(히스토리 테이블), 삭제(히스토리 테이블) 
+
+* 히스토리 테이블
+HISTORY_MODE, SEQ, REMARKS 추가
+접근로그 페이지: 경로/구분/메뉴명/사용자/URL 어떻게 가져오는지??
+
+엑셀 조회
+
+
+			     				  정보구분                            구분                메뉴명                        대상자
+							    (회원/일반)                (조회/엑셀/신규/수정/삭제)                                
+히스토리 테이블(신규, 수정, 삭제) : 테이블명                       신규, 수정, 삭제      ACC LOG테이블 조인(동일시간)       고객번호
+UNION ALL
+ACC LOG 테이블(조회, 엑셀)  :      메뉴명에서 CASE WHEN               조회, 엑셀             메뉴명                       고객번호
+						  (회원관리 => 회원/일반고객관리 => 일반)
+===================================================================================================================================================
+
+History
+1> 개인정보관련(일반고객,회원) CRA01M, CRA02M
+   CRA01H
+    :OLD 변경 전
+    :NEW 변경 후
+   CRA02H
+2> 권한관련
+3> 대여품관련
+박준서 10/19 10:16 비고 A -> B 로 변경
+ 누가? 언제? 등록을 했는지 insert history
+ 누가? 언제? 무엇을? 수정 했는지 update history
+ 누가? 언제? 삭제를 했는지 delete history
+ACC_LOG 이력
+1. UNION ALL
+ ACC_LOG + 신규 테이블
+ ACC_LOG ACC_LOG   NEW TABLE
+    10:20 조회> 10:21 저장 > 10:22 A->B
+1. ACC_LOG  그리드
+  신규 테이블 그리드
+
+정보구분: 회원, 일반 - 화면 셀렉트에서 테이블에 따라 구분값 기입 
+구분: LOG 테이블 
+메뉴명: LOG 테이블
+사용자: LOG 테이블 or 히스토리 테이블
+시간: LOG 테이블 or 히스토리 테이블
+IP: LOG 테이블 or 히스토리 테이블
+대상자: 히스토리 테이블 
+작업내용: 히스토리 테이블
+
+
+SEQ                       NUMBER              NOT NULL,  <= pk 줘야 함
+HISTORY_MODE              VARCHAR2(10 BYTE),
+WORK_DETAIL               VARCHAR2(1000 BYTE),
+RECORD_DATE               DATE
+
+
+COMMENT ON COLUMN USERVE.CRA01M_HISTORY.WORK_DETAIL IS '작업내용';
+COMMENT ON COLUMN USERVE.CRA01M_HISTORY.RECORD_DATE IS '기록날짜';
+
+DROP INDEX CRA03M_HISTORY_IDX02;
+
+CREATE INDEX USERVE.CRA05M_HISTORY_IDX01 ON USERVE.CRA05M_HISTORY
+(RECORD_DATE, CORP_CODE, WORK_DETAIL)
+LOGGING
+TABLESPACE TS_PMS
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           );            
+    
+
+
+
+ 
+
+1. 법인할인 고객(DC002) 공통코드
+
+신규(소분류 추가한 경우) - 대상: 고객명(고객번호) / 작업내용: 법인할인고객 신규 생성
+
+
+추가(사용여부 '예'로 변경한 경우) - 대상: 고객명(고객번호) / 작업내용: 법인할인고객 추가
+
+삭제(사용여부 '아니오'로 변경한 경우) - 대상: 고객명(고객번호) / 작업내용: 법인할인고객 삭제
+
+ 
+
+2. 회원관리_포인트저장(CR072) 공통코드
+
+수정(item1값 변경 한 경우): '대상': ?? / '작업내용': 회원 포인트 저장버튼 활성화 권한(n -> y)
+
+
+
+
+
+,'계약정보 수정 : ' || RTRIM(NVL(CASE    
+      WHEN REPLACE(NVL(:OLD.RENEW_DATE,'0'),'-','') <> REPLACE(NVL(:NEW.RENEW_DATE,'0'),'-','') THEN '개서일자('|| REPLACE(:OLD.RENEW_DATE,'-','') ||' -> '|| REPLACE(:NEW.RENEW_DATE,'-','') || ') / '		
+    END ||
+    CASE     
+      WHEN NVL(:OLD.ASSOCIATION_NUMBER,'0') <> NVL(:NEW.ASSOCIATION_NUMBER,'0') THEN '협회번호('|| :OLD.ASSOCIATION_NUMBER ||' -> '|| :NEW.ASSOCIATION_NUMBER || ') / '		
+    END ||
+    CASE   
+      WHEN REPLACE(NVL(:OLD.EDDATE,'0'),'-','') <> REPLACE(NVL(:NEW.EDDATE,'0'),'-','') THEN '만료일자('|| REPLACE(:OLD.EDDATE,'-','') ||' -> '|| REPLACE(:NEW.EDDATE,'-','') || ') / '		
+    END 
+  ,'동일내용 수정'),' / ')

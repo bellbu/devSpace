@@ -166,8 +166,48 @@ ORDER BY MONTH, CAR_ID DESC
 4.제스퍼 사용법
 5. 메이븐이란? https://goddaehee.tistory.com/199
 6. DAO, impl
-7. DAO, VO, DTO 차이? https://velog.io/@selffy/DAO-DTO-Service-Impl
+7. DAO, VO, DTO 차이? 
+https://velog.io/@selffy/DAO-DTO-Service-Impl   
+https://dkswnkk.tistory.com/500
+https://velog.io/@ha0kim/DAO-DTO-VO-%EC%B0%A8%EC%9D%B4
 
+8. 오라클 with 절, 서브쿼리 차이
 
+9. 메이븐 클린, 인스톨 하는 이유??
 
+10. 테이블 생성 시 해당내용
+CREATE INDEX USERVE.CRA01M_HISTORY_USER_IDX ON USERVE.CRA01M_HISTORY
+(CORP_CODE, GUEST_NO, SEQ)
+LOGGING
+TABLESPACE USERS
+PCTFREE    10
+INITRANS   2
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           );
+		   
+ALTER TABLE USERVE.CRA01M_HISTORY ADD (
+  PRIMARY KEY
+  (CORP_CODE, GUEST_NO, SEQ)
+  USING INDEX
+    TABLESPACE USERS
+    PCTFREE    10
+    INITRANS   2
+    MAXTRANS   255
+    STORAGE    (
+                INITIAL          64K
+                NEXT             1M
+                MINEXTENTS       1
+                MAXEXTENTS       UNLIMITED
+                PCTINCREASE      0
+                BUFFER_POOL      DEFAULT
+               )
+  ENABLE VALIDATE);
 
+11. 쿼리 속도 향상방법

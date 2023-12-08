@@ -1,0 +1,88 @@
+* 페이징 처리법
+0. 운영/개발 패키지 확인
+1. jsp 화면
+
+    1) 파라미터 추가(f_Retrieve() 포함)
+    postData : page : 1, intPageSize : 100
+
+    2) loadComplete에 footerDataPaging 처리
+    if(data.length>0){
+        var totalCnt = data.length > 0 ? data[0].totalCount : 0;
+        var totalSaleAmt = data.length > 0 ? data[0].totalSaleAmt : 0;
+        var totalUseAmt = data.length > 0 ? data[0].totalUseAmt : 0;
+        $("#gr_List").footerDataPaging([
+            { name : 'guestNo', setType : 'text', addText : '총' },
+            { name : 'officePosition', setType : 'text' ,  addText : numberWithCommas(totalCnt) + '명'},
+            { name : 'saleAmt', setType : 'text' ,  addText : numberWithCommas(totalSaleAmt) + '원'},
+            { name : 'useAmt', setType : 'text' ,  addText : numberWithCommas(totalUseAmt) + '원'}
+        ]);
+    } 
+
+2. controller, service, mapper : List<?> 형태여야 함
+   
+        HashMap<String, Object> param = RequestUtil.getParameter(request);
+		List<?> list = gslVisitService.VisitorDiscount_Select(param);
+		List<Map<String, Object>> result = (List<Map<String, Object>>) list;
+	     if (result.size()>0) {
+	         param.put("totalCount", result.get(0).get("totalCount").toString());
+	     } else {
+	         param.put("totalCount", "0");
+	     }
+	     CommonUtil.printTuiGridSet(param, list, response);
+
+
+3. xml에 파라미터 추가     		
+,#{page} 
+,#{intPageSize}
+
+4. DB
+1) 스펙, 바디 파라미터 추가
+,P_PAGE             VARCHAR2
+,P_PAGE_SIZE        VARCHAR2
+
+2) 바디 쿼리문 수정
+IS
+
+    V_TOT_PAGE_SIZE INT; 
+    V_TOT_SALE_AMT INT DEFAULT 0;
+    V_TOT_USE_AMT  INT DEFAULT 0;
+
+
+    V_TOT_ENTR_FEE INT DEFAULT 0;
+    
+
+
+BEGIN 
+
+    SELECT COUNT(*) 
+          ,NVL(SUM(BSA16D.SALE_AMT),0) AS TOTAL_SALE_AMT
+          ,NVL(SUM(BSA16D.USE_AMT),0) AS TOTAL_USE_AMT
+           INTO V_TOT_COUNT, V_TOT_SALE_AMT,  V_TOT_USE_AMT
+    FROM (
+
+          본 내용 쿼리
+        
+         );    
+
+    OPEN O_RESULTLIST FOR
+
+    SELECT B.*
+          ,V_TOT_PAGE_SIZE AS TOTAL_COUNT
+          ,V_TOT_SALE_AMT AS TOTAL_SALE_AMT
+          ,V_TOT_USE_AMT AS TOTAL_USE_AMT
+    FROM (
+          SELECT A.*, ROWNUM RNUM
+          FROM(
+
+               본 내용 쿼리
+              
+              ) A
+         WHERE ROWNUM <= P_PAGE * P_PAGE_SIZE 
+        ) B
+    WHERE RNUM >= (P_PAGE-1) * P_PAGE_SIZE+1
+    ;
+
+
+    
+   
+

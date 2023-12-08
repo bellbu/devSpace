@@ -104,3 +104,6 @@ $("#gr_List").getGrid().getPagination().movePageTo(targetRowsPageNum);
 
 
 $("#gr_List").movePageTo($("#gr_List").getGrid().getPagination()._currentPage);
+
+12. 선택된 데이터 값 가져오기
+$("#gr_List").getGridParam("selrow");

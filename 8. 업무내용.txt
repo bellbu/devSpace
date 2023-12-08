@@ -2858,20 +2858,608 @@ grvPopupMapper
 
 * 오늘 할일(2023-10-12)
 1. 루나엑스
-완료 - 요금정산관리 페이지 예약금 정산 확인예정
-완료- 매출합산 테이블 사용 페이지 조사
+- 요금정산관리 페이지 예약금 정산 확인예정
+- 매출합산 테이블 사용 페이지 조사
 
 2. 김치간
-- 알림톡 생성
+완료 - 알림톡 생성
 
 3. 제니패션
 - 환경설정
-
-
-
 
 GBB01D -- 정산Detail 테이블
 GBA01M -- 내장M 테이블
 GBB03S -- 매출합산 테이블
 GBA01D -- 내장D 테이블
 PSB40M -- 입금정보 테이블
+
+오늘 업무 보고
+1. 김치간 뮤지엄
+ - 신규 알림톡 생성
+
+2. 루나엑스
+ - 매출합산 테이블 제거 시 사용 페이지 문제 검수
+
+3. 제니패션
+ - 프로세스 파악
+
+1. 제니패션
+2. 루나엑스
+
+
+
+* 정산리스트 페이지
+  O SP_CHARGELIST_GR_LIST_SELECT_DETAIL : 활용: GBB01D테이블 조인하여 상세정보 탭에 받을금액 계산하여 표출
+                                          쿼리: (GBB03S.PAYMENT_AMT - GBB01D.PAY_AMT) AS TOT_AMT(받을 금액) 셀렉트
+
+* 요금정산관리 페이지
+	X SP_VISITORCHARGECALC_BOOKINGMASTERLIST_SELECT : 활용: gr_BookList 그리드에서 사용하지 않으므로 삭제해도 무방  
+  
+  O SP_VISITORCHARGECALC_SALEMASTERLIST_SELECT : 활용: GBA01D테이블 조인하여 gr_saleMaster 그리드에 입장료/카트료/레스토랑/그늘집/프로샵/대여료/객실/기타업장/이용액 표출
+                                                 쿼리: CLUB_AMT, RENT_AMT, ENTR_AMT, CART_AMT, PRO_AMT ,SHADE_AMT, CONDO_AMT 및 합산 셀렉트
+                                                                                           
+	X SP_VISITORCHARGECALC_SELECT_GROUP_AMT : 활용: 그룹정산내역 호출 사용x	
+
+	O SP_VISITORCHARGECALC_CALCINFO_SELECT : 활용: GBA01D테이블 조인하여 인원N/1 지불금액 조회 사용 쿼리: CLUB_AMT, RENT_AMT, CART_AMT, PRO_AMT, SHADE_AMT, PRACTICE_AMT, CONDO_AMT 합산 셀렉트
+
+	O SP_VISITORCHARGECALC_LOCKERCLOSELIST_SELECT : 활용: GBB03S테이블에 MODIFY_FLAG(수정여부) 카운트 조회하여 '정산준비'/'정산완료' 상태를 나타냄
+                                                  쿼리: MODI_CNT(카운트) 셀렉트  
+
+	△ SP_VISITORCHARGECALC_PAYINFOLIST_SELECT : 활용: 정산내역(지불내역) 그리드 표출	
+                                               쿼리: GBB01D테이블 조인에만 사용
+
+	O SP_VISITORCHARGECALC_SALE_ACTION_SAVE : 활용: 합산정보 저장	
+                                            쿼리: MODIFY_FLAG, ENTR_AMT, CLUB_AMT, RENT_AMT, CART_AMT, PRO_AMT, SHADE_AMT, CDD_FEE, CONDO_AMT, PRACTICE_AMT 해당컬럼 업데이트
+
+  O SP_VISITORCHARGECALC_CALC_ACTION_SAVE : 활용: 입금정보 저장	
+                                            쿼리: A.PAYMENT_AMT = PAY_AMT, MODIFY_FLAG = DECODE(PAY_AMT,0,MODIFY_FLAG,'3') 업데이트
+
+	O SP_VISITORCHARGECALC_CALC_ACTION_CANCEL_SAVE : 활용: 요금정산관리 - 합산정보 삭제 / 통합결제 팝업 - 취소승인(골프정산)
+                                                   쿼리: PAYMENT_AMT = SUM(NVL(PAY_AMT, 0), MODIFY_FLAG = 3 업데이트 
+
+	O UPDATE_DAY_GOLF_SALELIST: 활용: 전체매출재조회 버튼(정산내역생성 및 변경여부 체크 조회 일 전체 재조회)
+                              쿼리: USE_AMT 합산에 사용, MODIFY_FLAG > 0 조건 조회하여 0인 경우 해당지불락커 전체 삭제 후 인서트
+
+	O UPDATE_GOLF_SALELIST :  활용: 메인 그리드 바인드 시 정산내역생성 및 변경여부 체크	
+                            쿼리: MODIFY_FLAG > 0 조건 조회하여 0인 경우 해당지불락커 전체 삭제 후 인서트
+	
+
+* 일마감관리 페이지
+	X SP_SAVEGBCLOSINGDAYFORM_SELECT_TAX : 활용: 마감 시 RENT_PRSN 컬럼 셀렉트하여 데이터 전송하나 실제로 저장X
+
+
+* 내장객접수등록 페이지	
+	O DEPOSIT_USING : 활용: 예약금관리, SP_VISITORCHARGECALC_CALC_ACTION_SAVE 프로시저 호출
+                    쿼리: A.PAYMENT_AMT = PAY_AMT, MODIFY_FLAG = DECODE(PAY_AMT,0,MODIFY_FLAG,'3') 업데이트
+
+	O SP_SAVEACCEPTVISITORLISTFORM_SELECT_CALCULATE_CHK : 활용: 정산여부 확인	
+                                                        쿼리: MODIFY_FLAG > 2 조건으로 조회하여 카운트 
+
+	X SP_SAVEACCEPTVISITORLISTFORM_DELETE_ENTERD : 활용: 내장객 삭제
+	
+	X SP_SAVEACCEPTVISITORLISTFORM_DELETE_ALLRESERV : 활용: 내장팀삭제	
+
+* 오늘 할 일
+힐리언스 회사 변경 
+유심천 이미지 크기, 폰트 변경
+풀무원 차량 프로젝트 추가 ㅠ6ㅠ
+
+* 대여시설관리
+영업지원(대분류) => 시설관리(중분류 )
+1. 대여시설 그룹관리(FAC01M): Save
+ 영업지원 => 메뉴그룹등록 참고
+ 메뉴그룹 코드(001) 시퀀스
+2. 대여시설 관리(FAC01D)
+ 월력페이지 참고
+ 영업장 시설구분 현재상태 시설번호
+
+
+대여시설 그룹관리 /bs/SaveRentalFacGroupMngm.do
+대여시설 관리 /bs/SaveRentalFacMngm.do
+
+
+/spt/SaveMenuUpjangGrpForm_Select_Upjanglist.do
+/spt/SaveMenuUpjangGrpForm_Select_MenuList.do
+/spt/SaveMenuUpjangGrpForm_Select_Excel.do
+
+/spt/SaveMenuUpjangGrpForm_Select_Upjanglist.do
+/spt/SaveMenuUpjangGrpForm_Select_Excel.do
+/spt/SaveMenuUpjangGrpForm_Control.do
+
+
+
+북코스 비활성화 
+북코스 9홀만 등록(유효성 검사)
+
+
+호텔 / 골프 대여품 추가, 변경, 삭제 내역 history 관리 가능하도록 구조 변경
+=> 다음주 작업예정
+
+
+오늘 할 일
+완료 - 1. 대여시설 그룹관리
+완료 - 2. 대여시설 관리
+완료 - 3. 북코스 비활성화 
+풀무원차량 환경설정
+회원관리 확인
+
+
+오늘 할 일
+완료 - 1. 대여시설 관리 중복 프로시저 제거
+완료 -2. 발송내역 이미지 조회 레이아웃 
+3. 히스토리 파악
+ - 오라클 트리거 개념과 사용법
+완료 - 4. 김치간 뮤지엄 중복체크 
+
+5. 안드로이드 스튜디오 프로젝트 추가
+
+/bs/SaveRentalFacMngm_Select_FacilGroup.do
+
+
+
+* 발송내역 이미지 표출
+- 테이블 CRB01I, CRB01D
+- SMS/알림톡 본인부서 발송내역
+- SMS/알림톡 발송내역
+- 색상: #D3FCC8
+addRowClassName 로우 색상 추가
+
+예제)
+,loadComplete : function(json) {
+			var gr_FacilList = $("#gr_FacilList").getGrid();
+			$.each(gr_FacilList.getData(), function(index, rowData) {
+				var dayTypeCode = rowData["statusCode" ] == null ? "" : rowData["statusCode" ] + "";
+				switch (dayTypeCode) {
+					case '001' :
+						gr_FacilList.addRowClassName(index, "CellStyle001");
+					break;
+					case '002' :
+						gr_FacilList.addCellClassName(index, "statusCode", "CellStyle002");
+					break;
+					case '009' :
+						gr_FacilList.addCellClassName(index, "statusCode", "CellStyle009");
+					break;
+				}
+			});
+			
+		}
+
+
+
+* 오늘 할 일
+완료 1. 메일 업무 파악
+진행 중 - 2. 발송결과 이미지 조회 - 로우그리드 색상 표시
+2. 개인정보관련 테이블 파악
+
+cra01m, cra02m
+
+
+ 회원관리 탭: 회원정보탭, 혜택 탭, 포인트 탭, 계약정보 탭
+
+회원정보 탭
+CRA01M, CRA02M, CRA03M, CRA01I
+
+
+오늘 할 일
+핀크스
+1. - SMS/알림톡 본인부서 발송내역 
+(PKG_SMSANDTALKSTAT SELECT 추가, PKG_SMSANDTALKSTAT 이미지 셀렉트 프로시저 생성)
+
+2. 개인정보처리 로그 페이지 추가
+
+
+
+폰트, 스크롤, radio 버튼
+* 문제 페이지
+1.: 상단 검색 부분 깨짐
+3.식음예약관리: radio 버튼
+
+1. 하단 스크롤
+통합예약 - 통합예약조회
+영업일보(골프)
+영업일보(객실)
+영업일보(비오토피아)
+식음서비스 대상조회
+
+2. 폰트
+온천락카판매등록
+
+3. radio 버튼
+식음 예약관리
+대기예약등록
+
+4. 그 외 화면깨짐
+
+
+
+차주 업무
+1. 핀크스
+- PMS 확인 요청의 건 (12 대분류: 준환, 대국, 태민)
+오류 예시
+- 요금정산관리 기능 추가 확인 요청의 건
+- 히스토리 관리
+
+2. 루나엑스
+- 요금정산관리
+완료 - 1) 전체재조회 버튼 제거
+완료 - 2) 내장객 그리드 中 "레스토랑","그늘집","프로샵","객실" 제거
+완료 - 3) 입장료, 카트료 = GBA01D에서 조회
+완료 - 4)대여료(RENT_AMT) = PSC40M: RESERV_NO, RESERV_SEQ, ENTR_SEQ 기준 골프 대여 1102 에서 발생한 금액 SUM
+완료 - 5)기타업장(PRACTICE_AMT) = PSC40M: ESERV_NO, RESERV_SEQ, ENTR_SEQ 기준 골프 대여 1102 제외 발생한 금액 SUM
+
+6) 각 화면에 GBB03S 로직 제거
+
+
+요금정산 화면 외 GBB03S 건드리는 화면들 로직 제거
+로직이 제거됨에따라 에러or이슈발생시 보고
+
+
+* 오늘 할일 
+완료 - 1. 김치간
+
+2. 핀크스
+전체페이지 css 점검 (통합예약 완료)
+
+3. 루나엑스
+- 요금정산
+
+
+
+* GBB03S 제거 시 해당 컬럼
+MODIFY_FLAG
+CONDO_AMT
+
+* 오늘 할일(20231024)
+1. 핀크스
+완료 - 1) 골프영업, 경기운영 css 점검 
+완료 - 2) 요금정산관리 카드오픈 기능 추가
+
+3) 히스토리 관리 업무
+
+2. 루나엑스
+GBB03S => GBB01D 테이블
+
+3. 유심천
+
+
+* 오늘 할 일(2023-10-26)
+1. 핀크스 
+완료 - 요금정산 관리 페이지 스코어카드 
+완료 - 대분류' 객실영업', '단체' 점검 및 이슈 리스트 작성예정
+이슈리스트 - (영업일보(객실), 영업일보(비오토피아), TennisCourt 예약현황)
+
+2. 김치간뮤지엄
+고객 예약변경 및 취소
+- 이름 변경 시 인원체크 안하게끔 
+- 취소 시 취소프로세스 내에 F_TOTAL_WEEKDAYS 이용해서 3일전 오전 11시 까지 취소 못하게 처리
+
+
+* 오늘 할 일(2023-10-27)
+1. 핀크스
+완료 - 대분류 영업지원 점검 및 이슈 리스트 작성예정 
+
+2. 김치간
+예약 이름변경 시 유효성 검사 추가
+예약취소 시 기간에 따른 취소가능여부 유효성 검사 추가 
+
+3. 유심천
+완료 - 이미지 리사이즈
+
+
+//		loadCardBase = loadCardBase.getSubimage(129, 644, 375, 160);
+		loadCardBase = loadCardBase.getSubimage(45, 715, 569, 260); // 1: 낮을수록 왼쪽 2: 높을수록 아래, 3: 높을수록 길어짐
+
+
+
+    MK233286 4명 예약
+
+    MK233287 5명 예약
+
+* 오늘 할 일(2023-10-30)
+1. 핀크스
+완료 - 깨진 페이지 확인
+
+2. 김치간 뮤지엄
+완료 - 고객 예약변경 및 취소 화면에서  이름 변경 시 인원체크 안하게끔
+취소프로세스(ajax.php) 내에서  조회하는 쿼리 내  F_TOTAL_WEEKDAYS 이용해서 
+취소가능,불가능 체크(3일전 오전 11시 이내에 취소못하는 처리도 추가)
+
+3. 루나엑스
+- 매출합산 테이블 내장테이블 로직 적용
+
+유심천
+고객테스트 오후 3시
+
+체험 MK233290	10488	1698631463	체험테스트	010-6661-3077	1231@hanmail.net
+관람 MK233289	10489	1698631403	김종부2	010-6661-3076	123132@daum.net
+MK233288	10487	1698631360	김종부	010-6661-3076	123123123@hanmail.net
+MK233287	10485	1698394296	김종부12	010-6661-3076	123@gmail.com
+MK233286	10484	1698394176	김종부	010-6661-3076	테스트@hanmail.net
+MK233285	10483	1698393534	김종부	010-6661-3076	asdasd@hanmail.net
+
+
+* 오늘 할 일(2023-10-31)
+완료 - 1. 핀크스
+- CSS화면 수정
+- 개인정보처리로그
+완료 - 2. 루나엑스
+- 매출합산 테이블 대체
+
+
+1순위
+완료 - 통합예약조회
+완료 - 경기진행관리 => 홀별경과시간
+완료 - 스코어관리 => 홀뵬스코어기록(통합검색)
+
+
+* 오늘 할 일(2023-11-01)
+검수요청 중 - 알림톡 확인
+완료 - 문자 발송내역 상세정보 확인(WD2023-1299)
+완료 - pms 확인 요청건(WD2023-1280)
+
+
+* 오늘 할 일(2023-11-02)
+완료 - 개발반영 후 점검 
+완료 - 비즈톡 확인 점검
+
+* 오늘 할 일(2023-11-07)
+핀크스
+완료 - 대기예약 등록 / 회원변경명단조회 화면 수정예정
+- 디아넥스 알림톡 변경
+- 매뉴얼 작성
+- 신규 페이지 추가 작업
+
+
+* 오늘 할 일(2023-11-08)
+핀크스
+완료 - 1. 알림톡
+완료 - 2. 카트월별체크리스트 / 카트반기별체크리스트화면 수정예정
+완료 - 3. 온천락카판매등록 페이지 락카 삭제 시 입금내역 조회 쿼리 수정
+4. 개인정보처리로그 신규 페이지 추가 작업예정 (11월 15일 까지)
+완료 - 업데이트 컬럼 확인
+ - 삭제 확인
+ - 화면 만들기
+
+
+* 내일 할 일(2023-11-09)
+루나엑스 
+- 수정 추가
+핀크스
+완료 - 1.영업일보(객실/비오토피아/골프) PDF 잘림
+2. 개인정보처리 로그 신규 페이지 추가
+
+이번주 반영
+WD2023-1280 - css 깨짐
+WD2023-1314 - 비토주택현황조회 폰트 사이즈 확인
+WD2023-1276 - 요금정산관리 - 스코어카드 // 버튼 활성화 해야함
+WD2023-1270 개인정보 히스토리 // 운영DB: 트리거, 패키지 생성해야함
+
+
+* 오늘 할 일(2023-11-13)
+회원관리 
+완료 - 혜택, 포인트, 계약정보 히스토리 테이블 생성
+완료 - 트리거 생성 - 혜택, 포인트, 계약정보 히스토리 테이블 생성
+- 셀렉트
+
+완료 - 1. 혜택 : CRA04M 
+ PKG_SaveMemberForm.SP_UPDATE_GOLF_BENEFITS 
+ PKG_SaveMemberForm.SP_UPDATE_MERGE_BENEFITS
+
+GOLF_PYMT_CODE            골프요금코드   
+PODO_ROOM_PYMT_CODE       포도 객실요금코드
+THE_ANNEX_ROOM_PYMT_CODE  디아넥스 객실요금코드      
+ROOM_NO                   객실번호(주택번호)
+GOLF_Y_LIMIT              골프 년 한도
+GOLF_Y_M_WEEKDAY_LIMIT    골프 년 본인 주중 한도
+GOLF_Y_M_WEEKEND_LIMIT    골프 년 본인 주말 한도
+GOLF_Y_R_WEEKDAY_LIMIT    골프 년 추천 주중 한도
+GOLF_Y_R_WEEKEND_LIMIT    골프 년 추천 주말 한도
+GOLF_M_LIMIT              골프 월 한도
+GOLF_M_M_WEEKDAY_LIMIT    골프 월 본인 주중 한도
+GOLF_M_M_WEEKEND_LIMIT    골프 월 본인 주말 한도
+GOLF_M_R_TOTAL_LIMIT      골프 월 추천 한도
+GOLF_M_R_WEEKDAY_LIMIT    골프 월 추천 주중 한도
+GOLF_M_R_WEEKEND_LIMIT    골프 월 추천 주말 한도 GOLF_M_R_WEEKEND_LIMIT
+GOLF_R_WEEKDAY_DC_RATE    골프 추천 주중 할인율
+GOLF_R_WEEKEND_DC_RATE    골프 추천 주말 할인율
+GOLF_C_WEEKDAY_DC_RATE    골프 동반 주중 할인율
+GOLF_C_WEEKEND_DC_RATE    골프 동반 주말 할인율
+
+
+완료 - 2.포인트 : CRA05M
+PKG_SaveMemberForm.SP_INSERT_POINT 
+PKG_SaveMemberForm.SP_UPDATE_POINT
+
+ALL_POINT             전체포인트  
+PROSHOP_POINT         프로샵한도포인트
+ALL_REMAIN_POINT      잔여포인트
+PROSHOP_REMAIN_POINT  프로샵잔여포인트
+USE_FROM_DATE         시작일자
+USE_TO_DATE           종료일자
+RELATION_TYPE         멤버사코드
+
+
+완료 - 3.계약정보 : CRA03M
+PKG_SaveMemberForm.SP_UPDATE_CONTRACT
+
+RENEW_DATE 개서일자
+ASSOCIATION_NUMBER 협회번호
+EDDATE 만료일자
+     
+*오늘 할 일(2023-11-14)
+완료 - 요금정산 버튼 활성화 후 반영(WD2023-1274)
+개인정보처리로그 운영 씽크 반영(WD2023-1270)
+PMS 확인 요청(WD2023-1280, 1314)
+포캐스팅 생성 점검 후 반영예정 (WD2023-1324)
+
+
+*오늘 할 일(2023-11-15)
+대여품포캐스팅관리 - 업장코드 넣어서 포캐스팅? 확인!!!
+작업내용 검토 확인
+
+*오늘 할 일(2023-11-16)
+완료 - 사용자관리 트리거 생성
+- 페이지 화면 추가
+- 사용자별 권한 관리 트리거 생성
+보류 - 포캐스팅 생성
+
+* 오늘 할 일(2023-11-17)
+- 화면 조회 추가
+- 사용자별 권한 관리 트리거 생성
+- 포캐스팅 버튼 추가
+
+* 오늘 할 일(2023-11-21)
+완료 - 대여품 포캐스팅 생성 점검 및 반영 보고
+- 행관련 업무 일정
+- 루나엑스 대여품 등록
+
+* 오늘 할 일(2023-11-22)
+- 대여품 포캐스팅 리뷰 요청
+- 시간대별판매내역조회 쿼리 확인
+
+
+* 오늘 할 일(2023-11-23)
+완료 - 현재 법인PKG 엑셀 업로드 시 검증 항목 정리
+
+* 오늘 할 일(2023-11-24)
+완료 - (오전) HANG 관련 리스트 작성
+점검 중 - 유심천 에러 확인
+- 엑셀 업로드 휴대폰 검증
+- 권한관리 추가/변경/삭제 히스토리
+
+* 오늘 할 일(2023-11-27)
+완료 - 권한관리 추가/변경/삭제 히스토리
+- 유심천 에러 확인
+- POS 시나리오 테스트 요청
+- 엑셀 업로드 휴대폰 검증
+
+* 오늘 할 일(2023-11-28)
+완료 - COA01S, COB231D 테이블 씽크 확인
+완료 - 유심천 에러 확인
+완료 - 비오토피아 온천락카판매등록 댓글
+- 페이징 처리: 내장객매출현황(작업완료), F&B매출현황, 고객구분별매출액현황조회
+- 권한관리히스토리
+- 엑셀 업로드 휴대폰 검증
+
+* 오늘 할 일(2023-11-29)
+- 페이징 처리:  내장객매출현황(작업완료), F&B매출현황, 고객구분별매출액현황조회 
+- 엑셀 업로드 휴대폰 검증
+- 권한관리히스토리
+
+
+
+* 오늘 할 일(2023-11-30)
+완료 - 엑셀 업로드 휴대폰 검증
+- 권한관리히스토리
+완료 - 1) 대상자를 대상으로 변경
+완료 2) 그룹별권한관리 권한 부여
+
+* 오늘 할 일(2023-12-01)
+완료 - 권한관리히스토리
+- 법인pkg작업
+
+* 오늘 할 일(2023-12-04)
+완료 - 템플릿 등록
+완료 - 권한관련 히스토리 운영 테이블 및 트리거 생성
+- 시간대별판매내역조회(식음,부대,영업장)/ 외상매출금관리상세현황 페이징처리
+
+* 오늘 할 일(2023-12-05)
+- 김치간 뮤지엄 점검
+- 핀크스 메일 확인
+- 유심천 쿼리 변경
+- 핀크스 법인pkg 업로드 작업
+
+
+- 법인 pkg 작업
+1) 법인할인 고객(DC002) 공통코드
+- 신규(소분류 추가한 경우): '대상': 고객명(고객번호), '작업내용': 법인할인고객 신규 생성
+- 추가(사용여부 '예'로 변경한 경우): 고객명(고객번호), '작업내용': 법인할인고객 추가
+- 삭제(사용여부 '아니오'로 변경한 경우): '대상': 고객명(고객번호), '작업내용': 법인할인고객 삭제
+
+2) 회원관리_포인트저장(CR072) 공통코드
+- 수정: '대상': ??, '작업내용': 회원 포인트 저장버튼 활성화 권한(n -> y)
+
+- 법인할인 고객 신규 생성
+- 법인할인 고객 수정: 
+1) CR072 
+- 회원관리_포인트저장 신규:
+- 회원관리_포인트저장 수정:
+ 처리 작업리스트
+내장객매출현황(완료): PKG_VisitorDiscountList.SP_SELECT_ENTR_PRICE_LIST2
+F&B매출현황
+고객구분별매출액현황조회
+
+
+
+* 작업 리스트
+WD2023-1336  HANG 관련  12월 20일 까지(오전)
+WD2023-1268 권한관리 추가/변경/삭제 내역 히스토리 11월 29일까지(가능한 빨리 마무리)
+WD2023-1354 법인PKG업로드 양식 변경 12월 8일 까지
+
+
+현재 테이블 구조 상 "영업장" 별로 "모든 매출정보"는 가져올 수 있지만 
+"내장객" 별 "연습장"(UPJANG_CODE = ‘1501’) 매출정보는 후불내역에서만 가져올 수 있는 상황입니다.
+해당사항 연습장 매출정보 후불내역으로만 표출해도 되는지 문의 드립니다.
+
+
+이재근
+금년도에 법인 PKG 엑셀 업로드 관련하여, 내부에서 논의 되고 있는 방식은 다음과 같습니다.
+- 現 가입 되어 있는 법인PKG 대상자 LIST 엑셀 출력
+- 해당 엑셀 각 멤버사 담당자에게 전달
+- 멤버사 담당자는 갱신/제외 상태값 업데이트 및 신규 대상자 ROW 추가 후 핀크스 회신
+- 핀크스 담당자 회신 받은 엑셀 파일 업로드
+
+15:45:53
+
++ 해야 할 일
+현재 법인PKG 엑셀 업로드 시 검증 항목 정리 부탁 드립니다.
+예시)
+검증1. 임원 본인 성별 미 입력 시 ‘성별 확인’ 메시지 표출
+검증 2. 임원 휴대전화번호 존재 시 ‘임원 휴대전화 번호 확인’ 메시지 표출
+검증 목록 정리는 소스 보고 파악 하는 것이니 본인 외 담당자 지정 하여 확인 될 수 있도록 분배 바랍니다.
+
+
+
+
+(신규) 권한관리로그
+  - 개인정보처리시스템 접근권한 부여, 변경, 말소 내역 기록
+  ex) 완료 - 계정신규생성 : 사용자관리 페이지 내용(COA01H, COA01S)
+      완료 -권한등급부여, 권한그룹코드 : 사용자관리 페이지 내용
+      완료 -인사정보변경 - 권한그룹코드 초기화(null값), 계정사용여부N : 사용자관리 페이지 
+      사용자별권한관리 - '회원관리' 추가 : 사용자별 권한 관리 (사용자 리스트 테이블:COA01 / TOP메뉴 테이블 COB111D / 메뉴테이블 )
+
+사용자관리 : 계정 신규, 권한등급 부여, 권한그룹코드, 계정사용 여부
+  - /sys/SysUserMngm_Control.do
+  트리거 완료 - // 사용자 생성 : 사용자 생성(COA01S) => 메뉴 권한 생성(COB231D)
+  
+  // 사용자 수정 : 권한(COB231D) 삭제 후 새로 생성 => 사용자 수정(COA01S)
+                -- USER_ID       직원 아이디          
+                -- EMP_NAME      직원명        
+                -- PASSWORD_CODE 비밀번호    
+                AUTH_GROUP_CODE  권한 그룹 코드 => NULL값인 경우 다르게 표시
+                PERMISSION_CODE  권한 등급 코드
+                USE_YN           사용여부      => N값인 경우 다르게 표시
+                -- REMARK           비고
+                -- LOGIN_FAIL_CNT = 0
+
+
+ 트리거 완료 - // 사용자 삭제: 권한(COB231D) 삭제 => 사용자 삭제(COA01S)
+
+사용자별 권한관리: 메뉴 권한 추가, 제거 작업
+
+
+/crm/SaveGuestForm.do 일반고객관리
+/crm/SaveMemberForm.do 회원관리
+
+
+법인 PKG 업로드
+- CRA06M 테이블 설계
+
+
+작업 리스트
+WD2023-1336  HANG 관련  12월 20일 까지(오전)
+WD2023-1268 권한관리 추가/변경/삭제 내역 히스토리 11월 29일까지(가능한 빨리 마무리)
+WD2023-1354 법인PKG업로드 양식 변경 12월 8일 까지
+
+
+
