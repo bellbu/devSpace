@@ -144,9 +144,10 @@ ORDER BY MONTH, CAR_ID DESC
 완료 - 스프링부트 개념정리(인프런)
 완료 - 정보처리기사 필기
 
-자바스크립트 강의2강 (제로초:28강/119강),
-스프링 환경설정 강의 홍팍 9강/33강, 메타코딩 8강 까지
-쿼리 퀴즈 1문제
+자바스크립트 강의2강 (제로초:29강/119강),
+스프링 환경설정 강의 홍팍 19강/33강(코드작성은 11강 까지), 메타코딩 8강 까지
+메이븐 강의: 9강
+자바/자바스크립트 2문제(3문제 간격)
 소스트리 강의 4강 완료
 - 4강 다시 듣기
 =====================================
@@ -163,15 +164,23 @@ ORDER BY MONTH, CAR_ID DESC
 - DECODE: statement, NULL 비교 연산 가능
 - CASE WHEN: 함수, NULL 비교 연산 불가 (IS NULL 사용해야 함)
  
-4.제스퍼 사용법
+4. 제스퍼 사용법
 5. 메이븐이란? https://goddaehee.tistory.com/199
+
 6. DAO, impl
+
 7. DAO, VO, DTO 차이? 
 https://velog.io/@selffy/DAO-DTO-Service-Impl   
 https://dkswnkk.tistory.com/500
 https://velog.io/@ha0kim/DAO-DTO-VO-%EC%B0%A8%EC%9D%B4
 
 8. 오라클 with 절, 서브쿼리 차이
+
+8. JDBC란??
+오늘 할 일 (20203-10-28)
+스프링 강의,
+자바스크립트 강의,
+코딩문제 자바2문제 
 
 9. 메이븐 클린, 인스톨 하는 이유??
 
