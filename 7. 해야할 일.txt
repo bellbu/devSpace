@@ -174,13 +174,13 @@ https://velog.io/@selffy/DAO-DTO-Service-Impl
 https://dkswnkk.tistory.com/500
 https://velog.io/@ha0kim/DAO-DTO-VO-%EC%B0%A8%EC%9D%B4
 
-8. 오라클 with 절, 서브쿼리 차이
-
 8. JDBC란??
 오늘 할 일 (20203-10-28)
 스프링 강의,
 자바스크립트 강의,
 코딩문제 자바2문제 
+
+8. 오라클 with 절, 서브쿼리 차이
 
 9. 메이븐 클린, 인스톨 하는 이유??
 
